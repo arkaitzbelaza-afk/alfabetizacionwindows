@@ -1,0 +1,745 @@
+/* ===== RESET Y BASE ===== */
+* { margin: 0; padding: 0; box-sizing: border-box; }
+
+body {
+  font-family: 'Segoe UI', Arial, sans-serif;
+  font-size: 18px;
+  background: #f0f0f0;
+  color: #1a1a1a;
+  min-height: 100vh;
+}
+
+/* ===== CABECERA DEL TALLER ===== */
+.taller-header {
+  background: linear-gradient(135deg, #0078d4 0%, #005a9e 100%);
+  color: white;
+  padding: 18px 30px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  box-shadow: 0 2px 8px rgba(0,0,0,0.3);
+}
+.taller-header h1 { font-size: 22px; font-weight: 600; }
+.taller-header .modulo-badge {
+  background: rgba(255,255,255,0.2);
+  border: 1px solid rgba(255,255,255,0.4);
+  padding: 6px 14px;
+  border-radius: 20px;
+  font-size: 15px;
+}
+
+/* ===== BARRA DE PROGRESO ===== */
+.progreso-bar {
+  background: #d0d0d0;
+  height: 8px;
+}
+.progreso-fill {
+  background: #0078d4;
+  height: 100%;
+  transition: width 0.4s ease;
+}
+.progreso-texto {
+  text-align: center;
+  font-size: 13px;
+  color: #555;
+  padding: 4px;
+  background: #e8e8e8;
+}
+
+/* ===== CONTENIDO PRINCIPAL ===== */
+.contenido {
+  max-width: 960px;
+  margin: 0 auto;
+  padding: 30px 20px;
+}
+
+/* ===== DIAPOSITIVA / SLIDE ===== */
+.slide { display: none; }
+.slide.activo { display: block; }
+
+.slide-titulo {
+  font-size: 28px;
+  font-weight: 700;
+  color: #0078d4;
+  margin-bottom: 8px;
+  border-left: 5px solid #0078d4;
+  padding-left: 14px;
+}
+.slide-subtitulo {
+  font-size: 16px;
+  color: #666;
+  margin-bottom: 24px;
+  padding-left: 19px;
+}
+
+/* ===== TARJETA DE EXPLICACIÓN ===== */
+.explicacion {
+  background: white;
+  border-radius: 10px;
+  padding: 24px 28px;
+  margin-bottom: 22px;
+  box-shadow: 0 2px 6px rgba(0,0,0,0.1);
+  line-height: 1.7;
+}
+.explicacion p { margin-bottom: 12px; font-size: 19px; }
+.explicacion p:last-child { margin-bottom: 0; }
+
+.tip-box {
+  background: #e8f4fd;
+  border-left: 4px solid #0078d4;
+  border-radius: 0 8px 8px 0;
+  padding: 14px 18px;
+  margin: 16px 0;
+  font-size: 17px;
+}
+.tip-box strong { color: #005a9e; }
+
+.advertencia-box {
+  background: #fff8e1;
+  border-left: 4px solid #f9a825;
+  border-radius: 0 8px 8px 0;
+  padding: 14px 18px;
+  margin: 16px 0;
+  font-size: 17px;
+}
+
+/* ===== NAVEGACIÓN ===== */
+.navegacion {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-top: 30px;
+  padding-top: 20px;
+  border-top: 2px solid #ddd;
+}
+.btn {
+  padding: 14px 32px;
+  border: none;
+  border-radius: 6px;
+  font-size: 18px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.2s;
+}
+.btn-primario {
+  background: #0078d4;
+  color: white;
+}
+.btn-primario:hover { background: #005a9e; transform: translateY(-1px); }
+.btn-secundario {
+  background: #e0e0e0;
+  color: #333;
+}
+.btn-secundario:hover { background: #ccc; }
+.btn:disabled { opacity: 0.4; cursor: not-allowed; transform: none; }
+.contador-slide { color: #888; font-size: 16px; }
+
+/* ===== MENÚ PRINCIPAL (index) ===== */
+.menu-principal {
+  max-width: 800px;
+  margin: 0 auto;
+  padding: 40px 20px;
+  text-align: center;
+}
+.menu-principal h1 {
+  font-size: 34px;
+  color: #0078d4;
+  margin-bottom: 10px;
+}
+.menu-principal .subtitulo-menu {
+  font-size: 19px;
+  color: #555;
+  margin-bottom: 40px;
+}
+.tarjetas-menu {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+  gap: 20px;
+  margin-bottom: 30px;
+}
+.tarjeta-modulo {
+  background: white;
+  border-radius: 12px;
+  padding: 28px 20px;
+  text-decoration: none;
+  color: inherit;
+  box-shadow: 0 3px 10px rgba(0,0,0,0.1);
+  transition: all 0.25s;
+  border-top: 4px solid #0078d4;
+  display: block;
+}
+.tarjeta-modulo:hover {
+  transform: translateY(-4px);
+  box-shadow: 0 8px 20px rgba(0,120,212,0.2);
+}
+.tarjeta-modulo .icono-modulo { font-size: 48px; margin-bottom: 14px; }
+.tarjeta-modulo h3 { font-size: 20px; color: #0078d4; margin-bottom: 8px; }
+.tarjeta-modulo p { font-size: 15px; color: #666; line-height: 1.5; }
+.tarjeta-juego { border-top-color: #107c10; }
+.tarjeta-juego h3 { color: #107c10; }
+.tarjeta-juego:hover { box-shadow: 0 8px 20px rgba(16,124,16,0.2); }
+.tiempo-estimado {
+  display: inline-block;
+  background: #f0f0f0;
+  border-radius: 20px;
+  padding: 4px 12px;
+  font-size: 13px;
+  color: #777;
+  margin-top: 10px;
+}
+
+/* ===== SIMULADOR WINDOWS 10 ===== */
+.win10-simulador {
+  border-radius: 8px;
+  overflow: hidden;
+  box-shadow: 0 4px 20px rgba(0,0,0,0.25);
+  margin: 20px 0;
+  user-select: none;
+}
+
+/* Barra de título del Explorador */
+.win10-titlebar {
+  background: #f3f3f3;
+  height: 32px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 0 8px;
+  border-bottom: 1px solid #ccc;
+}
+.win10-titlebar-left {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}
+.win10-titlebar-icon { font-size: 16px; }
+.win10-titlebar-title { font-size: 12px; color: #333; }
+.win10-titlebar-btns {
+  display: flex;
+  gap: 0;
+}
+.win10-btn-min, .win10-btn-max, .win10-btn-close {
+  width: 46px;
+  height: 32px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 12px;
+  cursor: pointer;
+  color: #333;
+  transition: background 0.1s;
+}
+.win10-btn-min:hover, .win10-btn-max:hover { background: #e0e0e0; }
+.win10-btn-close:hover { background: #e81123; color: white; }
+
+/* Cinta (Ribbon) */
+.win10-ribbon {
+  background: #f3f3f3;
+  border-bottom: 1px solid #ccc;
+}
+.win10-ribbon-tabs {
+  display: flex;
+  padding: 0 8px;
+  border-bottom: 1px solid #ddd;
+}
+.win10-tab {
+  padding: 6px 14px;
+  font-size: 12px;
+  color: #333;
+  cursor: pointer;
+  border-bottom: 2px solid transparent;
+}
+.win10-tab.activo {
+  border-bottom: 2px solid #0078d4;
+  color: #0078d4;
+  font-weight: 600;
+}
+.win10-ribbon-content {
+  padding: 8px 12px;
+  display: flex;
+  gap: 6px;
+  flex-wrap: wrap;
+}
+.win10-ribbon-btn {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  padding: 6px 10px;
+  border-radius: 4px;
+  cursor: pointer;
+  font-size: 11px;
+  color: #333;
+  min-width: 52px;
+  transition: background 0.15s;
+  border: 1px solid transparent;
+}
+.win10-ribbon-btn:hover { background: #e5f0fb; border-color: #b3d6f5; }
+.win10-ribbon-btn.resaltado { background: #cce4f7; border-color: #0078d4; }
+.win10-ribbon-btn .rb-icon { font-size: 20px; margin-bottom: 3px; }
+.win10-ribbon-sep {
+  width: 1px;
+  background: #ccc;
+  margin: 4px 6px;
+  align-self: stretch;
+}
+
+/* Barra de navegación / dirección */
+.win10-navbar {
+  background: white;
+  border-bottom: 1px solid #ccc;
+  padding: 5px 8px;
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}
+.win10-nav-arrow {
+  width: 28px;
+  height: 28px;
+  border-radius: 4px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  font-size: 14px;
+  color: #555;
+}
+.win10-nav-arrow:hover { background: #e0e0e0; }
+.win10-nav-arrow.disabled { opacity: 0.3; cursor: default; }
+.win10-address-bar {
+  flex: 1;
+  background: white;
+  border: 1px solid #ccc;
+  border-radius: 3px;
+  padding: 4px 10px;
+  font-size: 13px;
+  color: #333;
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  height: 28px;
+}
+.win10-address-sep { color: #999; font-size: 11px; }
+.win10-search-bar {
+  width: 200px;
+  border: 1px solid #ccc;
+  border-radius: 3px;
+  padding: 4px 10px;
+  font-size: 13px;
+  height: 28px;
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  color: #999;
+}
+
+/* Cuerpo del explorador */
+.win10-body {
+  display: flex;
+  background: white;
+  height: 380px;
+}
+
+/* Panel lateral */
+.win10-panel-lateral {
+  width: 180px;
+  border-right: 1px solid #e0e0e0;
+  background: #f8f8f8;
+  overflow-y: auto;
+  padding: 6px 0;
+  flex-shrink: 0;
+}
+.win10-panel-section { margin-bottom: 4px; }
+.win10-panel-seccion-titulo {
+  font-size: 11px;
+  color: #888;
+  padding: 6px 14px 3px;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+}
+.win10-panel-item {
+  display: flex;
+  align-items: center;
+  gap: 7px;
+  padding: 5px 12px;
+  font-size: 13px;
+  color: #222;
+  cursor: pointer;
+  border-radius: 0;
+  white-space: nowrap;
+}
+.win10-panel-item:hover { background: #e5f0fb; }
+.win10-panel-item.seleccionado { background: #cce4f7; }
+.win10-panel-item .pi-icon { font-size: 16px; width: 20px; text-align: center; flex-shrink: 0; }
+.win10-panel-chevron { margin-left: auto; font-size: 10px; color: #999; }
+
+/* Panel principal */
+.win10-panel-principal {
+  flex: 1;
+  padding: 8px;
+  overflow-y: auto;
+}
+.win10-vista-iconos {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 4px;
+  align-content: flex-start;
+}
+.win10-icono {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  padding: 8px 6px;
+  border-radius: 4px;
+  cursor: pointer;
+  width: 90px;
+  transition: background 0.15s;
+}
+.win10-icono:hover { background: #e5f0fb; }
+.win10-icono.seleccionado { background: #cce4f7; outline: 1px solid #0078d4; }
+.win10-icono .ic-imagen { font-size: 40px; margin-bottom: 6px; }
+.win10-icono .ic-nombre {
+  font-size: 12px;
+  text-align: center;
+  line-height: 1.3;
+  word-break: break-word;
+  color: #222;
+}
+
+/* Barra de estado */
+.win10-statusbar {
+  background: #f3f3f3;
+  border-top: 1px solid #ccc;
+  padding: 3px 12px;
+  font-size: 12px;
+  color: #555;
+  display: flex;
+  justify-content: space-between;
+}
+
+/* ===== BARRA DE TAREAS WINDOWS 10 ===== */
+.win10-taskbar {
+  background: #1a1a2e;
+  height: 40px;
+  display: flex;
+  align-items: center;
+  padding: 0 4px;
+  gap: 2px;
+  border-radius: 0 0 8px 8px;
+}
+.win10-start-btn {
+  width: 48px;
+  height: 40px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: white;
+  font-size: 18px;
+  cursor: pointer;
+  transition: background 0.15s;
+}
+.win10-start-btn:hover { background: rgba(255,255,255,0.1); }
+.win10-taskbar-search {
+  background: rgba(255,255,255,0.12);
+  border-radius: 4px;
+  height: 30px;
+  width: 200px;
+  display: flex;
+  align-items: center;
+  padding: 0 10px;
+  gap: 8px;
+  color: rgba(255,255,255,0.7);
+  font-size: 13px;
+  cursor: pointer;
+}
+.win10-taskbar-icons {
+  display: flex;
+  align-items: center;
+  gap: 2px;
+  margin-left: 8px;
+}
+.win10-taskbar-icon {
+  width: 44px;
+  height: 40px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 20px;
+  cursor: pointer;
+  position: relative;
+  transition: background 0.15s;
+}
+.win10-taskbar-icon:hover { background: rgba(255,255,255,0.15); }
+.win10-taskbar-icon.abierto::after {
+  content: '';
+  position: absolute;
+  bottom: 3px;
+  left: 50%;
+  transform: translateX(-50%);
+  width: 20px;
+  height: 3px;
+  background: #0078d4;
+  border-radius: 2px;
+}
+.win10-taskbar-right {
+  margin-left: auto;
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  padding-right: 8px;
+}
+.win10-taskbar-clock {
+  color: white;
+  font-size: 12px;
+  text-align: center;
+  padding: 4px 8px;
+  line-height: 1.4;
+}
+
+/* ===== ETIQUETAS SEÑALADAS ===== */
+.etiqueta-señal {
+  position: relative;
+  display: inline-block;
+}
+.señal-popup {
+  position: absolute;
+  background: #0078d4;
+  color: white;
+  padding: 8px 14px;
+  border-radius: 8px;
+  font-size: 14px;
+  white-space: nowrap;
+  bottom: calc(100% + 10px);
+  left: 50%;
+  transform: translateX(-50%);
+  box-shadow: 0 3px 10px rgba(0,0,0,0.3);
+  z-index: 10;
+  pointer-events: none;
+}
+.señal-popup::after {
+  content: '';
+  position: absolute;
+  top: 100%;
+  left: 50%;
+  transform: translateX(-50%);
+  border: 7px solid transparent;
+  border-top-color: #0078d4;
+}
+
+/* ===== PASOS NUMERADOS ===== */
+.pasos-lista {
+  counter-reset: paso;
+  list-style: none;
+  margin: 16px 0;
+}
+.pasos-lista li {
+  display: flex;
+  align-items: flex-start;
+  gap: 14px;
+  margin-bottom: 16px;
+  font-size: 18px;
+  line-height: 1.6;
+}
+.pasos-lista li::before {
+  counter-increment: paso;
+  content: counter(paso);
+  background: #0078d4;
+  color: white;
+  font-weight: 700;
+  font-size: 16px;
+  min-width: 32px;
+  height: 32px;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+  margin-top: 2px;
+}
+
+/* ===== TECLADO ===== */
+.tecla {
+  display: inline-block;
+  background: #f5f5f5;
+  border: 1px solid #ccc;
+  border-bottom: 3px solid #aaa;
+  border-radius: 5px;
+  padding: 3px 10px;
+  font-size: 15px;
+  font-family: monospace;
+  color: #333;
+  margin: 0 3px;
+}
+
+/* ===== QUIZ ===== */
+.quiz-pregunta {
+  background: white;
+  border-radius: 10px;
+  padding: 24px 28px;
+  margin-bottom: 20px;
+  box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+}
+.quiz-pregunta h3 {
+  font-size: 21px;
+  color: #1a1a1a;
+  margin-bottom: 18px;
+  line-height: 1.5;
+}
+.quiz-opciones {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+.quiz-opcion {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 14px 18px;
+  border: 2px solid #ddd;
+  border-radius: 8px;
+  cursor: pointer;
+  font-size: 17px;
+  transition: all 0.2s;
+  background: white;
+}
+.quiz-opcion:hover { border-color: #0078d4; background: #f0f7ff; }
+.quiz-opcion.correcta { border-color: #107c10; background: #e8f5e9; color: #107c10; font-weight: 600; }
+.quiz-opcion.incorrecta { border-color: #d83b01; background: #fde7e0; color: #d83b01; }
+.quiz-opcion.desactivada { cursor: default; }
+.quiz-opcion input[type="radio"] { width: 20px; height: 20px; accent-color: #0078d4; }
+.feedback-quiz {
+  margin-top: 12px;
+  padding: 12px 16px;
+  border-radius: 6px;
+  font-size: 17px;
+  font-weight: 600;
+  display: none;
+}
+.feedback-quiz.correcto { background: #e8f5e9; color: #107c10; }
+.feedback-quiz.incorrecto { background: #fde7e0; color: #d83b01; }
+
+/* Puntuación final */
+.puntuacion-final {
+  text-align: center;
+  padding: 40px 20px;
+  background: white;
+  border-radius: 12px;
+  box-shadow: 0 3px 12px rgba(0,0,0,0.1);
+}
+.puntuacion-final .numero-puntos {
+  font-size: 80px;
+  font-weight: 700;
+  color: #0078d4;
+  line-height: 1;
+}
+.puntuacion-final .total-puntos { font-size: 28px; color: #888; }
+.puntuacion-final .mensaje-final { font-size: 22px; margin: 20px 0; color: #333; }
+.estrella { font-size: 40px; }
+
+/* ===== JUEGO ARRASTRAR ===== */
+.juego-zona {
+  display: flex;
+  gap: 24px;
+  flex-wrap: wrap;
+  margin: 20px 0;
+}
+.juego-archivos-pool {
+  background: white;
+  border-radius: 10px;
+  padding: 16px;
+  flex: 1;
+  min-width: 200px;
+  box-shadow: 0 2px 6px rgba(0,0,0,0.1);
+}
+.juego-archivos-pool h4 {
+  font-size: 16px;
+  color: #555;
+  margin-bottom: 12px;
+  text-align: center;
+}
+.archivo-arrastrable {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 10px 14px;
+  background: #f0f7ff;
+  border: 2px solid #b3d6f5;
+  border-radius: 7px;
+  margin-bottom: 8px;
+  cursor: grab;
+  font-size: 16px;
+  transition: all 0.2s;
+}
+.archivo-arrastrable:hover { background: #dceefb; transform: translateX(3px); }
+.archivo-arrastrable.arrastrando { opacity: 0.4; }
+.archivo-arrastrable .af-icon { font-size: 24px; }
+.carpetas-drop {
+  display: flex;
+  flex-direction: column;
+  gap: 14px;
+  flex: 2;
+  min-width: 280px;
+}
+.carpeta-drop-zona {
+  background: #fffde7;
+  border: 2px dashed #f9a825;
+  border-radius: 10px;
+  padding: 16px;
+  min-height: 100px;
+  transition: all 0.2s;
+}
+.carpeta-drop-zona.sobre { background: #fff8c5; border-color: #f57f17; border-style: solid; }
+.carpeta-drop-zona.correcta-flash { background: #e8f5e9; border-color: #107c10; border-style: solid; }
+.carpeta-drop-zona.incorrecta-flash { background: #fde7e0; border-color: #d83b01; border-style: solid; }
+.carpeta-drop-titulo {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  font-size: 16px;
+  font-weight: 600;
+  color: #555;
+  margin-bottom: 10px;
+}
+.carpeta-drop-titulo span { font-size: 22px; }
+.archivos-dentro {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+}
+.archivo-colocado {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  padding: 6px 10px;
+  background: white;
+  border-radius: 5px;
+  border: 1px solid #ccc;
+  font-size: 14px;
+}
+
+.juego-resultado {
+  text-align: center;
+  padding: 20px;
+  font-size: 20px;
+  font-weight: 600;
+  border-radius: 10px;
+  margin-top: 16px;
+  display: none;
+}
+.juego-resultado.bien { background: #e8f5e9; color: #107c10; }
+.juego-resultado.mal { background: #fde7e0; color: #d83b01; }
+
+/* ===== UTILIDADES ===== */
+.text-center { text-align: center; }
+.mt-20 { margin-top: 20px; }
+.mb-20 { margin-bottom: 20px; }
+.flex-row { display: flex; gap: 16px; flex-wrap: wrap; }
+.destacado { background: #fff3cd; border-radius: 4px; padding: 2px 6px; }
+.verde { color: #107c10; font-weight: 700; }
+.rojo { color: #d83b01; font-weight: 700; }
+
+/* ===== RESPONSIVE ===== */
+@media (max-width: 700px) {
+  .win10-panel-lateral { width: 130px; }
+  .win10-search-bar { width: 120px; }
+  .tarjetas-menu { grid-template-columns: 1fr 1fr; }
+}
