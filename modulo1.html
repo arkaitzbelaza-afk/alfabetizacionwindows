@@ -1,0 +1,505 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta name="author" content="Arkaitz Belaza">
+<title>Módulo 1 — El Explorador de Archivos</title>
+<link rel="stylesheet" href="css/estilos.css">
+<style>
+  .parte-señalada {
+    position: relative;
+    cursor: pointer;
+  }
+  .parte-señalada .tooltip-parte {
+    display: none;
+    position: absolute;
+    background: #0078d4;
+    color: white;
+    padding: 8px 14px;
+    border-radius: 8px;
+    font-size: 14px;
+    white-space: nowrap;
+    z-index: 20;
+    box-shadow: 0 3px 10px rgba(0,0,0,0.3);
+    pointer-events: none;
+  }
+  .parte-señalada:hover .tooltip-parte { display: block; }
+  .parte-señalada:hover { outline: 3px solid #0078d4; outline-offset: 2px; border-radius: 3px; }
+
+  .leyenda-partes {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 10px;
+    margin: 16px 0;
+  }
+  .leyenda-item {
+    display: flex;
+    align-items: flex-start;
+    gap: 10px;
+    background: white;
+    border-radius: 8px;
+    padding: 12px 14px;
+    box-shadow: 0 1px 4px rgba(0,0,0,0.08);
+  }
+  .leyenda-num {
+    background: #0078d4;
+    color: white;
+    width: 26px;
+    height: 26px;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-weight: 700;
+    font-size: 14px;
+    flex-shrink: 0;
+  }
+  .leyenda-item p { font-size: 15px; line-height: 1.4; }
+  .leyenda-item strong { font-size: 16px; display: block; margin-bottom: 3px; }
+
+  .metodo-abrir {
+    display: flex;
+    gap: 14px;
+    margin: 10px 0;
+    flex-wrap: wrap;
+  }
+  .metodo-card {
+    flex: 1;
+    min-width: 170px;
+    background: white;
+    border-radius: 10px;
+    padding: 18px 16px;
+    text-align: center;
+    box-shadow: 0 2px 6px rgba(0,0,0,0.1);
+    border-top: 3px solid #0078d4;
+  }
+  .metodo-card .m-icono { font-size: 36px; margin-bottom: 10px; }
+  .metodo-card h4 { font-size: 16px; color: #0078d4; margin-bottom: 6px; }
+  .metodo-card p { font-size: 14px; color: #555; line-height: 1.5; }
+
+  /* Resaltados interactivos del simulador */
+  .resaltar-1:hover, .resaltar-2:hover, .resaltar-3:hover,
+  .resaltar-4:hover, .resaltar-5:hover {
+    outline: 3px solid #ff6600;
+    outline-offset: 2px;
+    cursor: help;
+    border-radius: 3px;
+  }
+</style>
+</head>
+<body>
+
+<div class="taller-header">
+  <h1>📁 Módulo 1 — El Explorador de Archivos</h1>
+  <span class="modulo-badge">Módulo 1 de 3</span>
+</div>
+<div class="progreso-bar">
+  <div class="progreso-fill" id="progreso-fill" style="width:14%"></div>
+</div>
+<div class="progreso-texto" id="progreso-texto">Progreso: 14%</div>
+
+<div class="contenido">
+
+  <!-- SLIDE 1 -->
+  <div class="slide activo" id="slide-0">
+    <div class="slide-titulo">¿Qué es el Explorador de Archivos?</div>
+    <div class="slide-subtitulo">Empezamos desde cero</div>
+    <div class="explicacion">
+      <p>El <strong>Explorador de Archivos</strong> es el programa de Windows que te permite ver y organizar todo lo que tienes guardado en el ordenador: documentos, fotos, música, vídeos...</p>
+      <p>Es como un <strong>armario con cajones y carpetas</strong>. Cada cajón es una carpeta, y dentro de las carpetas están los archivos.</p>
+      <div class="tip-box">
+        <strong>💡 Para recordarlo fácil:</strong> El Explorador de Archivos = el "armario" de tu ordenador.
+      </div>
+      <p>En este módulo vas a aprender a abrirlo, a reconocer sus partes y a moverte por él sin perderte.</p>
+    </div>
+
+    <!-- Escritorio simplificado -->
+    <div class="win10-simulador">
+      <div style="background:#0078d4;height:280px;display:flex;align-items:flex-end;padding:10px;position:relative;">
+        <div style="position:absolute;top:20px;left:20px;display:flex;flex-direction:column;gap:16px;align-items:center;">
+          <div class="win10-icono" style="background:rgba(255,255,255,0.15);border-radius:6px;width:70px;">
+            <div class="ic-imagen">🖥️</div>
+            <div class="ic-nombre" style="color:white;font-size:11px;">Este equipo</div>
+          </div>
+          <div class="win10-icono" style="background:rgba(255,255,255,0.15);border-radius:6px;width:70px;">
+            <div class="ic-imagen">🗑️</div>
+            <div class="ic-nombre" style="color:white;font-size:11px;">Papelera</div>
+          </div>
+        </div>
+        <div style="position:absolute;top:20px;left:50%;transform:translateX(-50%);background:rgba(255,255,255,0.9);border-radius:10px;padding:14px 20px;text-align:center;max-width:280px;">
+          <div style="font-size:36px;margin-bottom:6px;">👆</div>
+          <div style="font-size:14px;color:#333;font-weight:600;">Este es el <strong>escritorio</strong> de Windows 10</div>
+          <div style="font-size:13px;color:#555;margin-top:4px;">La barra de abajo es la <strong>barra de tareas</strong></div>
+        </div>
+      </div>
+      <div class="win10-taskbar">
+        <div class="win10-start-btn">⊞</div>
+        <div class="win10-taskbar-search">🔍 Escribe aquí para buscar</div>
+        <div class="win10-taskbar-icons">
+          <div class="win10-taskbar-icon" title="Explorador de Archivos">📁</div>
+          <div class="win10-taskbar-icon" title="Edge">🌐</div>
+          <div class="win10-taskbar-icon" title="Tienda">🛒</div>
+        </div>
+        <div class="win10-taskbar-right">
+          <div class="win10-taskbar-clock">10:30<br>28/05/2026</div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- SLIDE 2 -->
+  <div class="slide" id="slide-1">
+    <div class="slide-titulo">Cómo abrir el Explorador de Archivos</div>
+    <div class="slide-subtitulo">Hay tres formas fáciles</div>
+    <div class="explicacion">
+      <p>Puedes abrir el Explorador de Archivos de tres maneras distintas. Elige la que más te guste:</p>
+    </div>
+
+    <div class="metodo-abrir">
+      <div class="metodo-card">
+        <div class="m-icono">📁</div>
+        <h4>Método 1</h4>
+        <p>Haz clic en el icono de carpeta amarilla en la <strong>barra de tareas</strong> (la barra de abajo)</p>
+      </div>
+      <div class="metodo-card">
+        <div class="m-icono">⊞</div>
+        <h4>Método 2</h4>
+        <p>Haz clic en el botón <strong>Inicio</strong> (la banderita de Windows abajo a la izquierda) y busca "Explorador"</p>
+      </div>
+      <div class="metodo-card">
+        <div class="m-icono">⌨️</div>
+        <h4>Método 3 (atajo)</h4>
+        <p>Mantén pulsada la tecla <span class="tecla">⊞ Windows</span> y pulsa <span class="tecla">E</span></p>
+      </div>
+    </div>
+
+    <div class="win10-simulador" style="margin-top:20px;">
+      <div class="win10-taskbar">
+        <div class="win10-start-btn" title="Botón Inicio" onclick="mostrarMensaje('¡Correcto! Este es el botón Inicio (banderita de Windows)', 'ok')" style="cursor:pointer;outline:3px solid #ff6600;">⊞
+          <div style="position:absolute;bottom:44px;left:0;background:#ff6600;color:white;padding:6px 10px;border-radius:6px;font-size:12px;white-space:nowrap;font-weight:600;">← Botón Inicio</div>
+        </div>
+        <div class="win10-taskbar-search">🔍 Escribe aquí para buscar</div>
+        <div class="win10-taskbar-icons" style="position:relative;">
+          <div class="win10-taskbar-icon abierto" onclick="mostrarMensaje('¡Correcto! Este icono abre el Explorador de Archivos', 'ok')" style="cursor:pointer;outline:3px solid #ff6600;position:relative;">
+            📁
+            <div style="position:absolute;bottom:44px;left:50%;transform:translateX(-50%);background:#ff6600;color:white;padding:6px 10px;border-radius:6px;font-size:12px;white-space:nowrap;font-weight:600;">← Explorador</div>
+          </div>
+          <div class="win10-taskbar-icon">🌐</div>
+        </div>
+        <div class="win10-taskbar-right">
+          <div class="win10-taskbar-clock">10:30<br>28/05/2026</div>
+        </div>
+      </div>
+    </div>
+    <div class="tip-box mt-20">
+      <strong>💡 Pruébalo ahora:</strong> Intenta abrir el Explorador de Archivos en tu ordenador usando uno de estos tres métodos.
+    </div>
+  </div>
+
+  <!-- SLIDE 3 -->
+  <div class="slide" id="slide-2">
+    <div class="slide-titulo">Las partes del Explorador de Archivos</div>
+    <div class="slide-subtitulo">Pasa el ratón por encima de cada parte para ver su nombre</div>
+    <div class="explicacion">
+      <p>El Explorador tiene varias partes. <strong>Pasa el ratón por encima de cada zona resaltada</strong> para ver qué es cada una.</p>
+    </div>
+
+    <div class="win10-simulador">
+      <!-- Título -->
+      <div class="win10-titlebar parte-señalada">
+        <div class="tooltip-parte" style="top:34px;left:0;">① Barra de título: muestra el nombre de la carpeta que tienes abierta</div>
+        <div class="win10-titlebar-left">
+          <span class="win10-titlebar-icon">📁</span>
+          <span class="win10-titlebar-title">Documentos — Explorador de archivos</span>
+        </div>
+        <div class="win10-titlebar-btns">
+          <div class="win10-btn-min">─</div>
+          <div class="win10-btn-max">□</div>
+          <div class="win10-btn-close">✕</div>
+        </div>
+      </div>
+      <!-- Cinta -->
+      <div class="win10-ribbon parte-señalada">
+        <div class="tooltip-parte" style="top:100%;left:0;">② La Cinta: botones para hacer cosas (copiar, pegar, nueva carpeta...)</div>
+        <div class="win10-ribbon-tabs">
+          <div class="win10-tab activo">Inicio</div>
+          <div class="win10-tab">Compartir</div>
+          <div class="win10-tab">Vista</div>
+        </div>
+        <div class="win10-ribbon-content">
+          <div class="win10-ribbon-btn"><span class="rb-icon">📌</span>Anclar al<br>acceso rápido</div>
+          <div class="win10-ribbon-sep"></div>
+          <div class="win10-ribbon-btn"><span class="rb-icon">📋</span>Copiar</div>
+          <div class="win10-ribbon-btn"><span class="rb-icon">✂️</span>Cortar</div>
+          <div class="win10-ribbon-btn"><span class="rb-icon">📂</span>Pegar</div>
+          <div class="win10-ribbon-sep"></div>
+          <div class="win10-ribbon-btn"><span class="rb-icon">📁</span>Nueva<br>carpeta</div>
+          <div class="win10-ribbon-btn"><span class="rb-icon">🗑️</span>Eliminar</div>
+          <div class="win10-ribbon-btn"><span class="rb-icon">✏️</span>Cambiar<br>nombre</div>
+        </div>
+      </div>
+      <!-- Barra de dirección -->
+      <div class="win10-navbar parte-señalada">
+        <div class="tooltip-parte" style="top:100%;left:0;">③ Barra de dirección: te dice en qué carpeta estás en este momento</div>
+        <div class="win10-nav-arrow">◀</div>
+        <div class="win10-nav-arrow">▶</div>
+        <div class="win10-nav-arrow">🔼</div>
+        <div class="win10-address-bar">
+          <span>🖥️ Este equipo</span>
+          <span class="win10-address-sep">›</span>
+          <span>📁 Documentos</span>
+        </div>
+        <div class="win10-search-bar">🔍 Buscar en Documentos</div>
+      </div>
+      <!-- Cuerpo -->
+      <div class="win10-body">
+        <div class="win10-panel-lateral parte-señalada" style="position:relative;">
+          <div class="tooltip-parte" style="top:10px;left:185px;width:200px;white-space:normal;">④ Panel lateral: acceso rápido a tus carpetas favoritas y al equipo</div>
+          <div class="win10-panel-section">
+            <div class="win10-panel-seccion-titulo">Acceso rápido</div>
+            <div class="win10-panel-item seleccionado"><span class="pi-icon">🖥️</span> Escritorio</div>
+            <div class="win10-panel-item"><span class="pi-icon">⬇️</span> Descargas</div>
+            <div class="win10-panel-item"><span class="pi-icon">📄</span> Documentos</div>
+            <div class="win10-panel-item"><span class="pi-icon">🖼️</span> Imágenes</div>
+          </div>
+          <div class="win10-panel-section">
+            <div class="win10-panel-seccion-titulo">Este equipo</div>
+            <div class="win10-panel-item"><span class="pi-icon">🖥️</span> Escritorio</div>
+            <div class="win10-panel-item"><span class="pi-icon">📄</span> Documentos</div>
+            <div class="win10-panel-item"><span class="pi-icon">💿</span> Windows (C:)</div>
+          </div>
+        </div>
+        <div class="win10-panel-principal parte-señalada" style="position:relative;">
+          <div class="tooltip-parte" style="top:10px;right:10px;left:auto;">⑤ Panel principal: aquí se ven las carpetas y archivos</div>
+          <div class="win10-vista-iconos">
+            <div class="win10-icono" onclick="seleccionarIcono(this)">
+              <div class="ic-imagen">📁</div>
+              <div class="ic-nombre">Mis fotos</div>
+            </div>
+            <div class="win10-icono" onclick="seleccionarIcono(this)">
+              <div class="ic-imagen">📁</div>
+              <div class="ic-nombre">Trabajo</div>
+            </div>
+            <div class="win10-icono" onclick="seleccionarIcono(this)">
+              <div class="ic-imagen">📄</div>
+              <div class="ic-nombre">carta.docx</div>
+            </div>
+            <div class="win10-icono" onclick="seleccionarIcono(this)">
+              <div class="ic-imagen">🖼️</div>
+              <div class="ic-nombre">foto_verano.jpg</div>
+            </div>
+            <div class="win10-icono" onclick="seleccionarIcono(this)">
+              <div class="ic-imagen">📊</div>
+              <div class="ic-nombre">gastos.xlsx</div>
+            </div>
+          </div>
+        </div>
+      </div>
+      <div class="win10-statusbar">
+        <span>5 elementos</span>
+        <span>📋 🔲</span>
+      </div>
+    </div>
+
+    <div class="leyenda-partes" style="margin-top:18px;">
+      <div class="leyenda-item">
+        <div class="leyenda-num">①</div>
+        <div><strong>Barra de título</strong><p>Muestra el nombre de la carpeta que tienes abierta.</p></div>
+      </div>
+      <div class="leyenda-item">
+        <div class="leyenda-num">②</div>
+        <div><strong>La Cinta</strong><p>Botones para copiar, pegar, crear carpetas, eliminar...</p></div>
+      </div>
+      <div class="leyenda-item">
+        <div class="leyenda-num">③</div>
+        <div><strong>Barra de dirección</strong><p>Te dice en qué carpeta estás. Puedes escribir ahí una ruta.</p></div>
+      </div>
+      <div class="leyenda-item">
+        <div class="leyenda-num">④</div>
+        <div><strong>Panel lateral</strong><p>Acceso rápido a Escritorio, Documentos, Imágenes...</p></div>
+      </div>
+      <div class="leyenda-item">
+        <div class="leyenda-num" style="background:#107c10;">⑤</div>
+        <div><strong>Panel principal</strong><p>Aquí ves todas las carpetas y archivos de la carpeta actual.</p></div>
+      </div>
+    </div>
+  </div>
+
+  <!-- SLIDE 4 -->
+  <div class="slide" id="slide-3">
+    <div class="slide-titulo">Cómo navegar por las carpetas</div>
+    <div class="slide-subtitulo">Abrir y volver: como entrar y salir de habitaciones</div>
+    <div class="explicacion">
+      <p>Para <strong>abrir una carpeta</strong>, simplemente haz <strong>doble clic</strong> sobre ella. La carpeta se abrirá y verás su contenido.</p>
+      <p>Para <strong>volver atrás</strong>, usa la flecha ◀ que está en la parte superior izquierda del Explorador.</p>
+      <div class="tip-box">
+        <strong>💡 Truco:</strong> La barra de dirección siempre te dice dónde estás. Si ves "Este equipo › Documentos › Fotos", significa que estás dentro de la carpeta "Fotos" que está dentro de "Documentos".
+      </div>
+    </div>
+
+    <div class="win10-simulador">
+      <div class="win10-navbar">
+        <div class="win10-nav-arrow" onclick="mostrarMensaje('¡Bien! El botón ◀ te lleva a la carpeta anterior', 'ok')" style="cursor:pointer;outline:3px solid #ff6600;" title="Botón Atrás">◀</div>
+        <div class="win10-nav-arrow disabled">▶</div>
+        <div class="win10-nav-arrow">🔼</div>
+        <div class="win10-address-bar">
+          <span>🖥️ Este equipo</span>
+          <span class="win10-address-sep">›</span>
+          <span>📁 Documentos</span>
+          <span class="win10-address-sep">›</span>
+          <span style="color:#0078d4;font-weight:600;">📁 Mis fotos</span>
+        </div>
+        <div class="win10-search-bar">🔍 Buscar</div>
+      </div>
+      <div class="win10-body">
+        <div class="win10-panel-lateral">
+          <div class="win10-panel-section">
+            <div class="win10-panel-seccion-titulo">Acceso rápido</div>
+            <div class="win10-panel-item"><span class="pi-icon">🖥️</span> Escritorio</div>
+            <div class="win10-panel-item seleccionado"><span class="pi-icon">📄</span> Documentos</div>
+            <div class="win10-panel-item"><span class="pi-icon">🖼️</span> Imágenes</div>
+          </div>
+        </div>
+        <div class="win10-panel-principal">
+          <div style="font-size:13px;color:#888;margin-bottom:10px;padding:4px;">Contenido de: Documentos › Mis fotos</div>
+          <div class="win10-vista-iconos">
+            <div class="win10-icono" onclick="seleccionarIcono(this);mostrarMensaje('Para abrir esta foto, haz DOBLE clic', 'info')">
+              <div class="ic-imagen">🖼️</div>
+              <div class="ic-nombre">vacaciones.jpg</div>
+            </div>
+            <div class="win10-icono" onclick="seleccionarIcono(this)">
+              <div class="ic-imagen">🖼️</div>
+              <div class="ic-nombre">cumpleaños.jpg</div>
+            </div>
+            <div class="win10-icono" onclick="seleccionarIcono(this)">
+              <div class="ic-imagen">🖼️</div>
+              <div class="ic-nombre">familia.jpg</div>
+            </div>
+          </div>
+        </div>
+      </div>
+      <div class="win10-statusbar"><span>3 elementos</span></div>
+    </div>
+
+    <div class="explicacion mt-20">
+      <ul class="pasos-lista">
+        <li>Para <strong>abrir</strong> una carpeta o archivo: haz <strong>doble clic</strong> sobre él</li>
+        <li>Para <strong>volver atrás</strong>: haz clic en la flecha <strong>◀</strong> (arriba a la izquierda)</li>
+        <li>Para <strong>subir un nivel</strong> (salir de la carpeta actual): haz clic en la flecha <strong>🔼</strong></li>
+        <li>Para saber <strong>dónde estás</strong>: mira la barra de dirección</li>
+      </ul>
+    </div>
+  </div>
+
+  <!-- SLIDE 5 -->
+  <div class="slide" id="slide-4">
+    <div class="slide-titulo">Actividad: ¿Reconoces las partes?</div>
+    <div class="slide-subtitulo">Haz clic en cada zona y comprueba que recuerdas qué es</div>
+    <div class="explicacion">
+      <p>Haz clic en cada zona del Explorador que aparece abajo. Aparecerá un mensaje diciendo qué es esa parte.</p>
+    </div>
+
+    <div class="win10-simulador">
+      <div class="win10-titlebar" onclick="mostrarMensaje('✔ ¡Correcto! Esta es la BARRA DE TÍTULO', 'ok')" style="cursor:pointer;">
+        <div class="win10-titlebar-left">
+          <span class="win10-titlebar-icon">📁</span>
+          <span class="win10-titlebar-title">Documentos — Explorador de archivos</span>
+        </div>
+        <div class="win10-titlebar-btns">
+          <div class="win10-btn-min">─</div>
+          <div class="win10-btn-max">□</div>
+          <div class="win10-btn-close">✕</div>
+        </div>
+      </div>
+      <div class="win10-ribbon" onclick="mostrarMensaje('✔ ¡Bien! Esta es LA CINTA con botones de herramientas', 'ok')" style="cursor:pointer;">
+        <div class="win10-ribbon-tabs">
+          <div class="win10-tab activo">Inicio</div>
+          <div class="win10-tab">Compartir</div>
+          <div class="win10-tab">Vista</div>
+        </div>
+        <div class="win10-ribbon-content">
+          <div class="win10-ribbon-btn"><span class="rb-icon">📋</span>Copiar</div>
+          <div class="win10-ribbon-btn"><span class="rb-icon">✂️</span>Cortar</div>
+          <div class="win10-ribbon-btn"><span class="rb-icon">📂</span>Pegar</div>
+          <div class="win10-ribbon-btn"><span class="rb-icon">📁</span>Nueva carpeta</div>
+          <div class="win10-ribbon-btn"><span class="rb-icon">🗑️</span>Eliminar</div>
+        </div>
+      </div>
+      <div class="win10-navbar" onclick="mostrarMensaje('✔ ¡Muy bien! Esta es la BARRA DE DIRECCIÓN — te dice dónde estás', 'ok')" style="cursor:pointer;">
+        <div class="win10-nav-arrow">◀</div>
+        <div class="win10-nav-arrow disabled">▶</div>
+        <div class="win10-nav-arrow">🔼</div>
+        <div class="win10-address-bar">
+          <span>🖥️ Este equipo</span>
+          <span class="win10-address-sep">›</span>
+          <span>📁 Documentos</span>
+        </div>
+        <div class="win10-search-bar">🔍 Buscar</div>
+      </div>
+      <div class="win10-body">
+        <div class="win10-panel-lateral" onclick="mostrarMensaje('✔ ¡Correcto! Este es el PANEL LATERAL o de navegación', 'ok')" style="cursor:pointer;">
+          <div class="win10-panel-section">
+            <div class="win10-panel-seccion-titulo">Acceso rápido</div>
+            <div class="win10-panel-item seleccionado"><span class="pi-icon">📄</span> Documentos</div>
+            <div class="win10-panel-item"><span class="pi-icon">🖼️</span> Imágenes</div>
+            <div class="win10-panel-item"><span class="pi-icon">⬇️</span> Descargas</div>
+          </div>
+        </div>
+        <div class="win10-panel-principal" onclick="mostrarMensaje('✔ ¡Perfecto! Este es el PANEL PRINCIPAL donde ves los archivos y carpetas', 'ok')" style="cursor:pointer;">
+          <div class="win10-vista-iconos">
+            <div class="win10-icono"><div class="ic-imagen">📁</div><div class="ic-nombre">Mis fotos</div></div>
+            <div class="win10-icono"><div class="ic-imagen">📁</div><div class="ic-nombre">Trabajo</div></div>
+            <div class="win10-icono"><div class="ic-imagen">📄</div><div class="ic-nombre">carta.docx</div></div>
+            <div class="win10-icono"><div class="ic-imagen">🖼️</div><div class="ic-nombre">foto.jpg</div></div>
+          </div>
+        </div>
+      </div>
+      <div class="win10-statusbar"><span>4 elementos</span></div>
+    </div>
+
+    <div class="tip-box mt-20">
+      <strong>🎯 Práctica en tu ordenador:</strong> Abre el Explorador de Archivos y trata de identificar cada una de las 5 partes que hemos visto. Pide ayuda si la necesitas.
+    </div>
+  </div>
+
+  <!-- SLIDE 6 — Resumen -->
+  <div class="slide" id="slide-5">
+    <div class="slide-titulo">Resumen del Módulo 1</div>
+    <div class="slide-subtitulo">¡Lo has completado! Esto es lo que has aprendido</div>
+
+    <div class="explicacion">
+      <ul class="pasos-lista">
+        <li>El <strong>Explorador de Archivos</strong> es el "armario" del ordenador donde están todas tus carpetas y archivos</li>
+        <li>Puedes abrirlo con el <strong>icono de carpeta</strong> de la barra de tareas, desde el <strong>menú Inicio</strong>, o con <span class="tecla">⊞</span> + <span class="tecla">E</span></li>
+        <li>Tiene 5 partes: barra de título, la cinta, barra de dirección, panel lateral y panel principal</li>
+        <li>Para <strong>abrir</strong> algo: doble clic. Para <strong>volver atrás</strong>: flecha ◀</li>
+        <li>La <strong>barra de dirección</strong> siempre te dice en qué carpeta estás</li>
+      </ul>
+    </div>
+
+    <div style="display:flex;gap:16px;justify-content:center;margin-top:30px;flex-wrap:wrap;">
+      <a href="index.html" class="btn btn-secundario">🏠 Menú principal</a>
+      <a href="modulo2.html" class="btn btn-primario">Siguiente: Módulo 2 — Carpetas →</a>
+    </div>
+  </div>
+
+  <!-- NAVEGACIÓN -->
+  <div class="navegacion">
+    <button class="btn btn-secundario" id="btn-anterior" disabled>◀ Anterior</button>
+    <span class="contador-slide" id="contador-slide">1 / 6</span>
+    <button class="btn btn-primario" id="btn-siguiente">Siguiente ▶</button>
+  </div>
+
+</div>
+
+<script src="js/interactivo.js"></script>
+<script>
+  // Actualizar contador al iniciar
+  document.addEventListener('DOMContentLoaded', () => {
+    const slides = document.querySelectorAll('.slide');
+    document.getElementById('contador-slide').textContent = '1 / ' + slides.length;
+  });
+</script>
+</body>
+</html>

@@ -1,0 +1,550 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta name="author" content="Arkaitz Belaza">
+<title>Juego 2 — Quiz de repaso</title>
+<link rel="stylesheet" href="css/estilos.css">
+<style>
+  body { background: linear-gradient(160deg, #f0f4ff 0%, #e8eeff 100%); }
+  .quiz-cabecera {
+    text-align: center;
+    padding: 30px 20px 16px;
+  }
+  .quiz-cabecera h1 { font-size: 28px; color: #0078d4; margin-bottom: 6px; }
+  .quiz-cabecera p { font-size: 17px; color: #555; }
+
+  .contenedor-quiz {
+    max-width: 740px;
+    margin: 0 auto;
+    padding: 0 16px 40px;
+  }
+
+  .barra-preguntas {
+    display: flex;
+    justify-content: center;
+    gap: 8px;
+    margin-bottom: 24px;
+    flex-wrap: wrap;
+  }
+  .indicador-pregunta {
+    width: 36px;
+    height: 36px;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 14px;
+    font-weight: 700;
+    background: #ddd;
+    color: #888;
+    transition: all 0.3s;
+  }
+  .indicador-pregunta.activa { background: #0078d4; color: white; }
+  .indicador-pregunta.correcta { background: #107c10; color: white; }
+  .indicador-pregunta.incorrecta { background: #d83b01; color: white; }
+
+  .quiz-pregunta {
+    background: white;
+    border-radius: 12px;
+    padding: 28px 28px;
+    box-shadow: 0 3px 12px rgba(0,0,0,0.1);
+    margin-bottom: 20px;
+    display: none;
+  }
+  .quiz-pregunta.activa { display: block; animation: entrar 0.3s ease; }
+  @keyframes entrar {
+    from { opacity: 0; transform: translateY(10px); }
+    to { opacity: 1; transform: translateY(0); }
+  }
+  .num-pregunta {
+    font-size: 13px;
+    color: #0078d4;
+    font-weight: 700;
+    margin-bottom: 10px;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+  }
+  .texto-pregunta {
+    font-size: 21px;
+    color: #1a1a1a;
+    margin-bottom: 22px;
+    line-height: 1.5;
+  }
+  .quiz-opciones {
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+  }
+  .opcion-btn {
+    display: flex;
+    align-items: center;
+    gap: 14px;
+    padding: 16px 20px;
+    border: 2px solid #ddd;
+    border-radius: 10px;
+    background: white;
+    cursor: pointer;
+    font-size: 18px;
+    text-align: left;
+    transition: all 0.2s;
+    width: 100%;
+  }
+  .opcion-btn:hover:not(:disabled) { border-color: #0078d4; background: #f0f7ff; transform: translateX(4px); }
+  .opcion-btn.correcta { border-color: #107c10; background: #e8f5e9; color: #107c10; font-weight: 600; }
+  .opcion-btn.incorrecta { border-color: #d83b01; background: #fde7e0; color: #d83b01; }
+  .opcion-btn:disabled { cursor: default; transform: none; }
+  .letra-opcion {
+    width: 32px;
+    height: 32px;
+    border-radius: 50%;
+    background: #f0f0f0;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-weight: 700;
+    font-size: 15px;
+    flex-shrink: 0;
+    color: #555;
+  }
+  .opcion-btn.correcta .letra-opcion { background: #107c10; color: white; }
+  .opcion-btn.incorrecta .letra-opcion { background: #d83b01; color: white; }
+
+  .feedback-box {
+    margin-top: 16px;
+    padding: 14px 18px;
+    border-radius: 8px;
+    font-size: 17px;
+    display: none;
+    line-height: 1.5;
+  }
+  .feedback-box.ok { background: #e8f5e9; color: #107c10; border-left: 4px solid #107c10; }
+  .feedback-box.mal { background: #fde7e0; color: #d83b01; border-left: 4px solid #d83b01; }
+
+  .btn-siguiente-preg {
+    display: none;
+    margin: 16px auto 0;
+    padding: 14px 32px;
+    background: #0078d4;
+    color: white;
+    border: none;
+    border-radius: 8px;
+    font-size: 18px;
+    font-weight: 600;
+    cursor: pointer;
+    transition: background 0.2s;
+  }
+  .btn-siguiente-preg:hover { background: #005a9e; }
+
+  /* Resultados finales */
+  .resultado-final {
+    display: none;
+    background: white;
+    border-radius: 16px;
+    padding: 40px 30px;
+    text-align: center;
+    box-shadow: 0 6px 24px rgba(0,0,0,0.12);
+    margin-top: 20px;
+  }
+  .rf-trofeo { font-size: 72px; margin-bottom: 16px; }
+  .rf-puntos { font-size: 64px; font-weight: 700; color: #0078d4; line-height: 1; }
+  .rf-de10 { font-size: 28px; color: #aaa; }
+  .rf-mensaje { font-size: 21px; color: #333; margin: 16px 0; }
+  .rf-estrellas { font-size: 40px; margin: 8px 0; }
+  .detalle-respuestas {
+    background: #f8f8f8;
+    border-radius: 10px;
+    padding: 16px;
+    margin: 20px 0;
+    text-align: left;
+  }
+  .detalle-respuestas h4 { font-size: 17px; color: #555; margin-bottom: 10px; }
+  .detalle-fila {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    padding: 6px 0;
+    border-bottom: 1px solid #eee;
+    font-size: 15px;
+  }
+  .detalle-fila:last-child { border-bottom: none; }
+  .det-icono { font-size: 18px; width: 24px; text-align: center; flex-shrink: 0; }
+  .botones-rf { display: flex; gap: 12px; justify-content: center; margin-top: 24px; flex-wrap: wrap; }
+</style>
+</head>
+<body>
+
+<div class="taller-header">
+  <h1>❓ Juego 2 — Quiz de repaso</h1>
+  <span class="modulo-badge">🎮 Quiz final</span>
+</div>
+
+<div class="quiz-cabecera">
+  <h1>¿Cuánto recuerdas?</h1>
+  <p>10 preguntas sobre lo que has aprendido en el taller. ¡Sin prisa!</p>
+</div>
+
+<div class="contenedor-quiz">
+
+  <div class="barra-preguntas" id="barra-preguntas">
+    <!-- generada por JS -->
+  </div>
+
+  <!-- PREGUNTA 1 -->
+  <div class="quiz-pregunta activa" id="p1">
+    <div class="num-pregunta">Pregunta 1 de 10</div>
+    <div class="texto-pregunta">¿Cuál es la forma más rápida de abrir el Explorador de Archivos con el teclado?</div>
+    <div class="quiz-opciones">
+      <button class="opcion-btn" onclick="responder(this,false,1,'La tecla F1 abre la Ayuda de Windows, no el Explorador.')">
+        <span class="letra-opcion">A</span> Pulsar la tecla F1
+      </button>
+      <button class="opcion-btn" onclick="responder(this,true,1,'¡Exacto! La tecla Windows + E abre directamente el Explorador de Archivos.')">
+        <span class="letra-opcion">B</span> Pulsar <span class="tecla" style="font-size:14px;">⊞ Windows</span> + <span class="tecla" style="font-size:14px;">E</span>
+      </button>
+      <button class="opcion-btn" onclick="responder(this,false,1,'Ctrl+A selecciona todo el contenido de una carpeta, no abre el Explorador.')">
+        <span class="letra-opcion">C</span> Pulsar <span class="tecla" style="font-size:14px;">Ctrl</span> + <span class="tecla" style="font-size:14px;">A</span>
+      </button>
+      <button class="opcion-btn" onclick="responder(this,false,1,'Alt+Tab cambia entre ventanas abiertas, no abre el Explorador.')">
+        <span class="letra-opcion">D</span> Pulsar <span class="tecla" style="font-size:14px;">Alt</span> + <span class="tecla" style="font-size:14px;">Tab</span>
+      </button>
+    </div>
+    <div class="feedback-box" id="fb1"></div>
+    <button class="btn-siguiente-preg" id="sig1" onclick="siguientePregunta(2)">Siguiente pregunta →</button>
+  </div>
+
+  <!-- PREGUNTA 2 -->
+  <div class="quiz-pregunta" id="p2">
+    <div class="num-pregunta">Pregunta 2 de 10</div>
+    <div class="texto-pregunta">¿Para qué sirve la <strong>Barra de dirección</strong> del Explorador de Archivos?</div>
+    <div class="quiz-opciones">
+      <button class="opcion-btn" onclick="responder(this,false,2,'Los botones de copiar y pegar están en la Cinta (Ribbon), no en la barra de dirección.')">
+        <span class="letra-opcion">A</span> Para copiar y pegar archivos
+      </button>
+      <button class="opcion-btn" onclick="responder(this,false,2,'La búsqueda de archivos se hace en la barra de búsqueda (la de la derecha), no en la de dirección.')">
+        <span class="letra-opcion">B</span> Para buscar archivos por nombre
+      </button>
+      <button class="opcion-btn" onclick="responder(this,true,2,'¡Correcto! La barra de dirección muestra en qué carpeta estás en este momento, como un mapa de tu ubicación.')">
+        <span class="letra-opcion">C</span> Para saber en qué carpeta estás en cada momento
+      </button>
+      <button class="opcion-btn" onclick="responder(this,false,2,'El panel lateral (a la izquierda) es el que muestra las carpetas favoritas, no la barra de dirección.')">
+        <span class="letra-opcion">D</span> Para ver las carpetas favoritas
+      </button>
+    </div>
+    <div class="feedback-box" id="fb2"></div>
+    <button class="btn-siguiente-preg" id="sig2" onclick="siguientePregunta(3)">Siguiente pregunta →</button>
+  </div>
+
+  <!-- PREGUNTA 3 -->
+  <div class="quiz-pregunta" id="p3">
+    <div class="num-pregunta">Pregunta 3 de 10</div>
+    <div class="texto-pregunta">¿Qué hay que hacer para <strong>abrir</strong> un archivo o carpeta en el Explorador?</div>
+    <div class="quiz-opciones">
+      <button class="opcion-btn" onclick="responder(this,false,3,'Un solo clic solo selecciona el archivo (lo pone en azul), no lo abre.')">
+        <span class="letra-opcion">A</span> Hacer un solo clic
+      </button>
+      <button class="opcion-btn" onclick="responder(this,true,3,'¡Muy bien! El doble clic (dos clics rápidos) abre carpetas y archivos.')">
+        <span class="letra-opcion">B</span> Hacer <strong>doble clic</strong>
+      </button>
+      <button class="opcion-btn" onclick="responder(this,false,3,'El clic derecho abre un menú de opciones, pero no abre directamente el archivo.')">
+        <span class="letra-opcion">C</span> Hacer clic con el botón derecho del ratón
+      </button>
+      <button class="opcion-btn" onclick="responder(this,false,3,'La tecla Intro funciona para confirmar nombres (al renombrar), pero para abrir lo más habitual es el doble clic.')">
+        <span class="letra-opcion">D</span> Pulsar la tecla Intro sin tocar el ratón
+      </button>
+    </div>
+    <div class="feedback-box" id="fb3"></div>
+    <button class="btn-siguiente-preg" id="sig3" onclick="siguientePregunta(4)">Siguiente pregunta →</button>
+  </div>
+
+  <!-- PREGUNTA 4 -->
+  <div class="quiz-pregunta" id="p4">
+    <div class="num-pregunta">Pregunta 4 de 10</div>
+    <div class="texto-pregunta">Quieres crear una carpeta nueva. ¿Cuáles de estas opciones son correctas?</div>
+    <div class="quiz-opciones">
+      <button class="opcion-btn" onclick="responder(this,false,4,'Ctrl+N abre una nueva ventana del Explorador, no crea una carpeta nueva.')">
+        <span class="letra-opcion">A</span> Pulsar <span class="tecla" style="font-size:14px;">Ctrl</span> + <span class="tecla" style="font-size:14px;">N</span>
+      </button>
+      <button class="opcion-btn" onclick="responder(this,true,4,'¡Correcto! Usando la Cinta (pestaña Inicio → Nueva carpeta) es una de las formas de crear una carpeta.')">
+        <span class="letra-opcion">B</span> Hacer clic en "Nueva carpeta" de la Cinta (pestaña Inicio)
+      </button>
+      <button class="opcion-btn" onclick="responder(this,false,4,'La papelera es para eliminar archivos, no para crear carpetas.')">
+        <span class="letra-opcion">C</span> Hacer doble clic en la papelera de reciclaje
+      </button>
+      <button class="opcion-btn" onclick="responder(this,false,4,'F5 actualiza el contenido de la carpeta (como refrescar). No crea carpetas.')">
+        <span class="letra-opcion">D</span> Pulsar la tecla F5
+      </button>
+    </div>
+    <div class="feedback-box" id="fb4"></div>
+    <button class="btn-siguiente-preg" id="sig4" onclick="siguientePregunta(5)">Siguiente pregunta →</button>
+  </div>
+
+  <!-- PREGUNTA 5 -->
+  <div class="quiz-pregunta" id="p5">
+    <div class="num-pregunta">Pregunta 5 de 10</div>
+    <div class="texto-pregunta">¿Qué tecla pulsas para <strong>renombrar</strong> una carpeta o archivo que has seleccionado?</div>
+    <div class="quiz-opciones">
+      <button class="opcion-btn" onclick="responder(this,false,5,'F1 es la tecla de Ayuda en la mayoría de programas de Windows.')">
+        <span class="letra-opcion">A</span> <span class="tecla" style="font-size:14px;">F1</span>
+      </button>
+      <button class="opcion-btn" onclick="responder(this,false,5,'F4 en el Explorador suele activar la barra de dirección para editar la ruta.')">
+        <span class="letra-opcion">B</span> <span class="tecla" style="font-size:14px;">F4</span>
+      </button>
+      <button class="opcion-btn" onclick="responder(this,true,5,'¡Exacto! La tecla F2 activa el modo de renombrar. Escribe el nuevo nombre y pulsa Intro para confirmar.')">
+        <span class="letra-opcion">C</span> <span class="tecla" style="font-size:14px;">F2</span>
+      </button>
+      <button class="opcion-btn" onclick="responder(this,false,5,'F12 en muchos programas abre el diálogo "Guardar como".')">
+        <span class="letra-opcion">D</span> <span class="tecla" style="font-size:14px;">F12</span>
+      </button>
+    </div>
+    <div class="feedback-box" id="fb5"></div>
+    <button class="btn-siguiente-preg" id="sig5" onclick="siguientePregunta(6)">Siguiente pregunta →</button>
+  </div>
+
+  <!-- PREGUNTA 6 -->
+  <div class="quiz-pregunta" id="p6">
+    <div class="num-pregunta">Pregunta 6 de 10</div>
+    <div class="texto-pregunta">Borraste una carpeta sin querer. ¿Dónde puedes ir a recuperarla?</div>
+    <div class="quiz-opciones">
+      <button class="opcion-btn" onclick="responder(this,false,6,'La carpeta Documentos guarda tus documentos, pero no las cosas eliminadas.')">
+        <span class="letra-opcion">A</span> A la carpeta Documentos
+      </button>
+      <button class="opcion-btn" onclick="responder(this,false,6,'Descargas guarda lo que descargas de internet, no lo que eliminas.')">
+        <span class="letra-opcion">B</span> A la carpeta Descargas
+      </button>
+      <button class="opcion-btn" onclick="responder(this,true,6,'¡Correcto! La Papelera de Reciclaje guarda temporalmente todo lo que eliminas. Puedes abrir la papelera y hacer clic derecho → Restaurar para recuperarlo.')">
+        <span class="letra-opcion">C</span> A la <strong>Papelera de Reciclaje</strong> del escritorio
+      </button>
+      <button class="opcion-btn" onclick="responder(this,false,6,'Este equipo muestra los discos y unidades, no los archivos eliminados.')">
+        <span class="letra-opcion">D</span> A "Este equipo"
+      </button>
+    </div>
+    <div class="feedback-box" id="fb6"></div>
+    <button class="btn-siguiente-preg" id="sig6" onclick="siguientePregunta(7)">Siguiente pregunta →</button>
+  </div>
+
+  <!-- PREGUNTA 7 -->
+  <div class="quiz-pregunta" id="p7">
+    <div class="num-pregunta">Pregunta 7 de 10</div>
+    <div class="texto-pregunta">¿Qué significa la extensión <strong>.pdf</strong> en un archivo?</div>
+    <div class="quiz-opciones">
+      <button class="opcion-btn" onclick="responder(this,false,7,'Los archivos .docx son los documentos de Microsoft Word, no los PDF.')">
+        <span class="letra-opcion">A</span> Es un documento de Microsoft Word
+      </button>
+      <button class="opcion-btn" onclick="responder(this,false,7,'Las imágenes suelen tener extensiones como .jpg, .png o .gif, no .pdf.')">
+        <span class="letra-opcion">B</span> Es una imagen o fotografía
+      </button>
+      <button class="opcion-btn" onclick="responder(this,true,7,'¡Bien! PDF significa "Portable Document Format". Son documentos que se pueden leer en cualquier ordenador y no se modifican fácilmente.')">
+        <span class="letra-opcion">C</span> Es un documento PDF que se puede leer en cualquier ordenador
+      </button>
+      <button class="opcion-btn" onclick="responder(this,false,7,'Los archivos de música tienen extensiones como .mp3 o .wav, no .pdf.')">
+        <span class="letra-opcion">D</span> Es un archivo de música
+      </button>
+    </div>
+    <div class="feedback-box" id="fb7"></div>
+    <button class="btn-siguiente-preg" id="sig7" onclick="siguientePregunta(8)">Siguiente pregunta →</button>
+  </div>
+
+  <!-- PREGUNTA 8 -->
+  <div class="quiz-pregunta" id="p8">
+    <div class="num-pregunta">Pregunta 8 de 10</div>
+    <div class="texto-pregunta">¿Qué hacen las teclas <strong>Ctrl + Z</strong>?</div>
+    <div class="quiz-opciones">
+      <button class="opcion-btn" onclick="responder(this,false,8,'Ctrl+C es la combinación para copiar, no para deshacer.')">
+        <span class="letra-opcion">A</span> Copian el archivo seleccionado
+      </button>
+      <button class="opcion-btn" onclick="responder(this,false,8,'Ctrl+V es para pegar. Ctrl+Z es para deshacer.')">
+        <span class="letra-opcion">B</span> Pegan el archivo copiado
+      </button>
+      <button class="opcion-btn" onclick="responder(this,true,8,'¡Perfecto! Ctrl+Z es el "deshacer". Si borras algo, mueves algo sin querer o cometes un error, Ctrl+Z lo revierte. ¡Es como una máquina del tiempo!')">
+        <span class="letra-opcion">C</span> <strong>Deshacen</strong> la última acción (como volver atrás)
+      </button>
+      <button class="opcion-btn" onclick="responder(this,false,8,'Ctrl+S es para guardar un archivo. Ctrl+Z es para deshacer.')">
+        <span class="letra-opcion">D</span> Guardan el archivo
+      </button>
+    </div>
+    <div class="feedback-box" id="fb8"></div>
+    <button class="btn-siguiente-preg" id="sig8" onclick="siguientePregunta(9)">Siguiente pregunta →</button>
+  </div>
+
+  <!-- PREGUNTA 9 -->
+  <div class="quiz-pregunta" id="p9">
+    <div class="num-pregunta">Pregunta 9 de 10</div>
+    <div class="texto-pregunta">Quieres que una foto quede tanto en la carpeta "Fotos 2024" como en "Fotos Familiares". ¿Qué haces?</div>
+    <div class="quiz-opciones">
+      <button class="opcion-btn" onclick="responder(this,false,9,'Cortar (Ctrl+X) mueve el archivo a un solo sitio. Solo quedaría en "Fotos Familiares", no en los dos.')">
+        <span class="letra-opcion">A</span> Cortar la foto (<span class="tecla" style="font-size:13px;">Ctrl+X</span>) y pegarla en "Fotos Familiares"
+      </button>
+      <button class="opcion-btn" onclick="responder(this,true,9,'¡Correcto! Copiar (Ctrl+C) y pegar (Ctrl+V) hace que el archivo exista en los dos sitios a la vez.')">
+        <span class="letra-opcion">B</span> <strong>Copiar</strong> la foto (<span class="tecla" style="font-size:13px;">Ctrl+C</span>) y pegarla en "Fotos Familiares"
+      </button>
+      <button class="opcion-btn" onclick="responder(this,false,9,'Borrar la foto la elimina del todo. No es lo que queremos aquí.')">
+        <span class="letra-opcion">C</span> Borrar la foto y volver a crearla
+      </button>
+      <button class="opcion-btn" onclick="responder(this,false,9,'No hay ninguna tecla especial para duplicar así. La forma correcta es Copiar y Pegar.')">
+        <span class="letra-opcion">D</span> Pulsar <span class="tecla" style="font-size:13px;">Ctrl+D</span> para duplicar
+      </button>
+    </div>
+    <div class="feedback-box" id="fb9"></div>
+    <button class="btn-siguiente-preg" id="sig9" onclick="siguientePregunta(10)">Siguiente pregunta →</button>
+  </div>
+
+  <!-- PREGUNTA 10 -->
+  <div class="quiz-pregunta" id="p10">
+    <div class="num-pregunta">Pregunta 10 de 10</div>
+    <div class="texto-pregunta">¿Qué teclas usas para <strong>guardar</strong> rápidamente un documento en el que estás trabajando?</div>
+    <div class="quiz-opciones">
+      <button class="opcion-btn" onclick="responder(this,false,10,'Ctrl+P abre el diálogo de impresión, no guarda el archivo.')">
+        <span class="letra-opcion">A</span> <span class="tecla" style="font-size:14px;">Ctrl</span> + <span class="tecla" style="font-size:14px;">P</span>
+      </button>
+      <button class="opcion-btn" onclick="responder(this,true,10,'¡Muy bien! Ctrl+S (S de Save, que en inglés significa guardar) es la forma más rápida de guardar un documento en casi todos los programas de Windows.')">
+        <span class="letra-opcion">B</span> <span class="tecla" style="font-size:14px;">Ctrl</span> + <span class="tecla" style="font-size:14px;">S</span>
+      </button>
+      <button class="opcion-btn" onclick="responder(this,false,10,'Ctrl+G en algunos programas en español puede ser "Guardar", pero el estándar universal es Ctrl+S.')">
+        <span class="letra-opcion">C</span> <span class="tecla" style="font-size:14px;">Ctrl</span> + <span class="tecla" style="font-size:14px;">G</span>
+      </button>
+      <button class="opcion-btn" onclick="responder(this,false,10,'Ctrl+X es para cortar (mover) archivos, no para guardar.')">
+        <span class="letra-opcion">D</span> <span class="tecla" style="font-size:14px;">Ctrl</span> + <span class="tecla" style="font-size:14px;">X</span>
+      </button>
+    </div>
+    <div class="feedback-box" id="fb10"></div>
+    <button class="btn-siguiente-preg" id="sig10" onclick="mostrarResultados()">Ver mis resultados →</button>
+  </div>
+
+  <!-- RESULTADOS FINALES -->
+  <div class="resultado-final" id="resultado-final">
+    <div class="rf-trofeo" id="rf-trofeo">🏆</div>
+    <div class="rf-puntos" id="rf-puntos">0</div>
+    <div class="rf-de10">de 10</div>
+    <div class="rf-estrellas" id="rf-estrellas">⭐⭐⭐</div>
+    <div class="rf-mensaje" id="rf-mensaje"></div>
+
+    <div class="detalle-respuestas" id="detalle-resp">
+      <h4>Repaso de tus respuestas:</h4>
+      <!-- generado por JS -->
+    </div>
+
+    <div class="botones-rf">
+      <button class="btn btn-secundario" onclick="reiniciarQuiz()">🔄 Intentar de nuevo</button>
+      <a href="juego1.html" class="btn btn-secundario">← Juego 1</a>
+      <a href="index.html" class="btn btn-primario">🏠 Menú principal</a>
+    </div>
+  </div>
+
+</div>
+
+<script src="js/interactivo.js"></script>
+<script>
+const resumenPreguntas = [
+  { texto: 'Abrir el Explorador de Archivos', correcta: 'Windows + E' },
+  { texto: 'Barra de dirección', correcta: 'Dice en qué carpeta estás' },
+  { texto: 'Abrir un archivo', correcta: 'Doble clic' },
+  { texto: 'Crear carpeta nueva', correcta: 'Botón "Nueva carpeta" en la Cinta' },
+  { texto: 'Renombrar archivo/carpeta', correcta: 'Tecla F2' },
+  { texto: 'Recuperar algo eliminado', correcta: 'Papelera de Reciclaje' },
+  { texto: 'Extensión .pdf', correcta: 'Documento PDF' },
+  { texto: 'Ctrl + Z', correcta: 'Deshacer última acción' },
+  { texto: 'Tener un archivo en dos carpetas', correcta: 'Copiar y Pegar' },
+  { texto: 'Guardar un documento', correcta: 'Ctrl + S' }
+];
+
+let preguntaActual = 1;
+let puntuacion = 0;
+let respuestas = [];
+
+// Crear indicadores
+document.addEventListener('DOMContentLoaded', () => {
+  const barra = document.getElementById('barra-preguntas');
+  for (let i = 1; i <= 10; i++) {
+    const div = document.createElement('div');
+    div.className = 'indicador-pregunta' + (i === 1 ? ' activa' : '');
+    div.id = 'ind' + i;
+    div.textContent = i;
+    barra.appendChild(div);
+  }
+});
+
+function responder(btn, esCorrecta, numPregunta, explicacion) {
+  const preg = document.getElementById('p' + numPregunta);
+  preg.querySelectorAll('.opcion-btn').forEach(b => b.disabled = true);
+  const fb = document.getElementById('fb' + numPregunta);
+  const ind = document.getElementById('ind' + numPregunta);
+
+  if (esCorrecta) {
+    btn.classList.add('correcta');
+    fb.className = 'feedback-box ok';
+    fb.innerHTML = '✔ ' + explicacion;
+    puntuacion++;
+    ind.classList.add('correcta');
+    respuestas[numPregunta - 1] = true;
+  } else {
+    btn.classList.add('incorrecta');
+    fb.className = 'feedback-box mal';
+    fb.innerHTML = '✖ ' + explicacion;
+    ind.classList.add('incorrecta');
+    respuestas[numPregunta - 1] = false;
+    preg.querySelectorAll('.opcion-btn').forEach(b => {
+      if (b.getAttribute('onclick')?.includes('true')) b.classList.add('correcta');
+    });
+  }
+  ind.classList.remove('activa');
+  fb.style.display = 'block';
+  document.getElementById('sig' + numPregunta).style.display = 'block';
+}
+
+function siguientePregunta(num) {
+  document.getElementById('p' + (num - 1)).classList.remove('activa');
+  document.getElementById('p' + num).classList.add('activa');
+  document.getElementById('ind' + num).classList.add('activa');
+  preguntaActual = num;
+  document.getElementById('p' + num).scrollIntoView({ behavior: 'smooth', block: 'start' });
+}
+
+function mostrarResultados() {
+  document.getElementById('p10').classList.remove('activa');
+  const resultado = document.getElementById('resultado-final');
+  resultado.style.display = 'block';
+  document.getElementById('rf-puntos').textContent = puntuacion;
+
+  let trofeo, estrellas, mensaje;
+  if (puntuacion === 10) {
+    trofeo = '🏆'; estrellas = '⭐⭐⭐';
+    mensaje = '¡Extraordinario! Has respondido todo correctamente. ¡Eres una experta en Windows 10!';
+    document.getElementById('rf-puntos').style.color = '#f9a825';
+  } else if (puntuacion >= 8) {
+    trofeo = '🥇'; estrellas = '⭐⭐⭐';
+    mensaje = '¡Excelente! Casi todo correcto. Tienes un dominio muy bueno de Windows 10.';
+    document.getElementById('rf-puntos').style.color = '#107c10';
+  } else if (puntuacion >= 6) {
+    trofeo = '🥈'; estrellas = '⭐⭐';
+    mensaje = '¡Muy bien! Recuerdas la mayor parte. Repasa las respuestas incorrectas.';
+  } else if (puntuacion >= 4) {
+    trofeo = '🥉'; estrellas = '⭐';
+    mensaje = 'Buen intento. Te recomendamos repasar los módulos y volver a intentarlo.';
+    document.getElementById('rf-puntos').style.color = '#f9a825';
+  } else {
+    trofeo = '💪'; estrellas = '⭐';
+    mensaje = 'No te preocupes. Repasa los módulos con calma y vuelve a intentar el quiz.';
+    document.getElementById('rf-puntos').style.color = '#d83b01';
+  }
+  document.getElementById('rf-trofeo').textContent = trofeo;
+  document.getElementById('rf-estrellas').textContent = estrellas;
+  document.getElementById('rf-mensaje').textContent = mensaje;
+
+  const detalle = document.getElementById('detalle-resp');
+  let html = '<h4>Repaso de tus respuestas:</h4>';
+  resumenPreguntas.forEach((p, i) => {
+    const ok = respuestas[i];
+    const icono = ok === true ? '✅' : ok === false ? '❌' : '⬜';
+    html += `<div class="detalle-fila"><span class="det-icono">${icono}</span><div><strong>${p.texto}</strong>${ok === false ? '<br><span style="color:#d83b01;font-size:13px;">Respuesta: ' + p.correcta + '</span>' : ''}</div></div>`;
+  });
+  detalle.innerHTML = html;
+  resultado.scrollIntoView({ behavior: 'smooth', block: 'start' });
+}
+
+function reiniciarQuiz() {
+  location.reload();
+}
+</script>
+</body>
+</html>
