@@ -1,0 +1,542 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta name="author" content="Arkaitz Belaza">
+<title>Módulo 2 — Carpetas</title>
+<link rel="stylesheet" href="css/estilos.css">
+<style>
+  .demo-interactiva {
+    background: white;
+    border-radius: 10px;
+    padding: 20px 24px;
+    margin: 16px 0;
+    box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+  }
+  .demo-interactiva h4 {
+    font-size: 18px;
+    color: #0078d4;
+    margin-bottom: 14px;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+  }
+  .btn-demo {
+    padding: 10px 20px;
+    background: #0078d4;
+    color: white;
+    border: none;
+    border-radius: 6px;
+    font-size: 16px;
+    cursor: pointer;
+    margin: 4px;
+    transition: background 0.2s;
+  }
+  .btn-demo:hover { background: #005a9e; }
+  .btn-demo.verde { background: #107c10; }
+  .btn-demo.verde:hover { background: #0a5e0a; }
+  .btn-demo.rojo { background: #d83b01; }
+  .btn-demo.rojo:hover { background: #a02900; }
+
+  .menu-contextual {
+    background: white;
+    border: 1px solid #ccc;
+    border-radius: 4px;
+    box-shadow: 0 4px 12px rgba(0,0,0,0.2);
+    padding: 4px 0;
+    width: 200px;
+    display: none;
+    position: absolute;
+    z-index: 100;
+    font-size: 14px;
+  }
+  .menu-contextual.visible { display: block; }
+  .mc-item {
+    padding: 8px 16px;
+    cursor: pointer;
+    color: #222;
+    display: flex;
+    align-items: center;
+    gap: 10px;
+  }
+  .mc-item:hover { background: #e5f0fb; }
+  .mc-sep { height: 1px; background: #eee; margin: 4px 0; }
+  .mc-item.resaltado { color: #0078d4; font-weight: 600; }
+  .mc-item.resaltado:hover { background: #cce4f7; }
+
+  .carpeta-nueva-demo {
+    display: none;
+    align-items: center;
+    gap: 8px;
+    padding: 8px;
+    background: #e8f4fd;
+    border-radius: 6px;
+    border: 2px solid #0078d4;
+    margin-top: 10px;
+    width: fit-content;
+  }
+  .carpeta-nueva-demo .ic-imagen { font-size: 36px; }
+  .nombre-editable {
+    background: white;
+    border: 1px solid #0078d4;
+    border-radius: 3px;
+    padding: 4px 8px;
+    font-size: 14px;
+    width: 140px;
+    outline: none;
+  }
+
+  /* Animación de papelera */
+  @keyframes caer {
+    0% { transform: translateY(0) rotate(0deg); opacity: 1; }
+    100% { transform: translateY(40px) rotate(15deg); opacity: 0; }
+  }
+  .icono-cayendo { animation: caer 0.5s ease forwards; }
+</style>
+</head>
+<body>
+
+<div class="taller-header">
+  <h1>🗂️ Módulo 2 — Carpetas</h1>
+  <span class="modulo-badge">Módulo 2 de 3</span>
+</div>
+<div class="progreso-bar">
+  <div class="progreso-fill" id="progreso-fill" style="width:14%"></div>
+</div>
+<div class="progreso-texto" id="progreso-texto">Progreso: 14%</div>
+
+<div class="contenido">
+
+  <!-- SLIDE 1 -->
+  <div class="slide activo" id="slide-0">
+    <div class="slide-titulo">¿Qué es una carpeta?</div>
+    <div class="slide-subtitulo">Como las carpetas físicas, pero en el ordenador</div>
+    <div class="explicacion">
+      <p>Una <strong>carpeta</strong> en el ordenador es exactamente igual a una carpeta de papel: sirve para <strong>guardar cosas dentro</strong> y tenerlas organizadas.</p>
+      <p>Dentro de una carpeta puedes guardar archivos (documentos, fotos, música...) e incluso <strong>otras carpetas</strong>.</p>
+      <div class="tip-box">
+        <strong>💡 Ejemplo del mundo real:</strong><br>
+        Piensa en un archivador con carpetas dentro. Cada carpeta tiene un nombre ("Facturas 2024", "Fotos de familia", "Recetas"...) y dentro están los papeles o fotos.
+      </div>
+      <p>En el ordenador, las carpetas se representan con un <strong>icono amarillo</strong> 📁.</p>
+    </div>
+
+    <div class="win10-simulador">
+      <div class="win10-navbar">
+        <div class="win10-nav-arrow disabled">◀</div>
+        <div class="win10-nav-arrow disabled">▶</div>
+        <div class="win10-nav-arrow disabled">🔼</div>
+        <div class="win10-address-bar">
+          <span>🖥️ Este equipo</span>
+          <span class="win10-address-sep">›</span>
+          <span>📁 Documentos</span>
+        </div>
+        <div class="win10-search-bar">🔍 Buscar</div>
+      </div>
+      <div class="win10-body">
+        <div class="win10-panel-lateral">
+          <div class="win10-panel-section">
+            <div class="win10-panel-seccion-titulo">Acceso rápido</div>
+            <div class="win10-panel-item seleccionado"><span class="pi-icon">📄</span> Documentos</div>
+            <div class="win10-panel-item"><span class="pi-icon">🖼️</span> Imágenes</div>
+          </div>
+        </div>
+        <div class="win10-panel-principal">
+          <div class="win10-vista-iconos">
+            <div class="win10-icono" onclick="seleccionarIcono(this);mostrarMensaje('📁 Esta es una CARPETA — contiene archivos dentro. Haz doble clic para abrirla.', 'info')">
+              <div class="ic-imagen">📁</div>
+              <div class="ic-nombre">Mis fotos</div>
+            </div>
+            <div class="win10-icono" onclick="seleccionarIcono(this);mostrarMensaje('📁 Otra CARPETA — esta contiene documentos de trabajo.', 'info')">
+              <div class="ic-imagen">📁</div>
+              <div class="ic-nombre">Trabajo</div>
+            </div>
+            <div class="win10-icono" onclick="seleccionarIcono(this);mostrarMensaje('📁 Una carpeta con recetas. ¡Puedes poner el nombre que quieras!', 'info')">
+              <div class="ic-imagen">📁</div>
+              <div class="ic-nombre">Recetas</div>
+            </div>
+            <div class="win10-icono" onclick="seleccionarIcono(this);mostrarMensaje('📄 Esto es un ARCHIVO (no es carpeta) — es un documento de Word.', 'info')">
+              <div class="ic-imagen">📄</div>
+              <div class="ic-nombre">carta.docx</div>
+            </div>
+          </div>
+          <div class="tip-box" style="margin-top:14px;font-size:14px;">
+            💡 <strong>Haz clic</strong> en cada icono para ver si es carpeta o archivo.
+          </div>
+        </div>
+      </div>
+      <div class="win10-statusbar"><span>4 elementos (3 carpetas, 1 archivo)</span></div>
+    </div>
+  </div>
+
+  <!-- SLIDE 2 -->
+  <div class="slide" id="slide-1">
+    <div class="slide-titulo">Cómo crear una carpeta nueva</div>
+    <div class="slide-subtitulo">Sigue los pasos y pruébalo tú mismo</div>
+    <div class="explicacion">
+      <p>Para crear una carpeta nueva, tienes <strong>dos formas</strong>:</p>
+    </div>
+
+    <div style="display:flex;gap:16px;flex-wrap:wrap;margin-bottom:20px;">
+      <div style="flex:1;min-width:240px;background:white;border-radius:10px;padding:18px;box-shadow:0 2px 6px rgba(0,0,0,0.1);border-top:3px solid #0078d4;">
+        <h4 style="color:#0078d4;margin-bottom:12px;">Forma 1: Usando la Cinta</h4>
+        <ul class="pasos-lista">
+          <li>Abre el Explorador y ve a la carpeta donde quieres crearla</li>
+          <li>Haz clic en la pestaña <strong>"Inicio"</strong> de la cinta</li>
+          <li>Haz clic en <strong>"Nueva carpeta"</strong></li>
+          <li>Escribe el nombre y pulsa <span class="tecla">Intro ↵</span></li>
+        </ul>
+      </div>
+      <div style="flex:1;min-width:240px;background:white;border-radius:10px;padding:18px;box-shadow:0 2px 6px rgba(0,0,0,0.1);border-top:3px solid #107c10;">
+        <h4 style="color:#107c10;margin-bottom:12px;">Forma 2: Clic derecho</h4>
+        <ul class="pasos-lista">
+          <li>Ve a la carpeta donde quieres crearla</li>
+          <li>Haz <strong>clic derecho</strong> en un espacio vacío</li>
+          <li>Elige <strong>"Nuevo"</strong> y luego <strong>"Carpeta"</strong></li>
+          <li>Escribe el nombre y pulsa <span class="tecla">Intro ↵</span></li>
+        </ul>
+      </div>
+    </div>
+
+    <!-- Simulación interactiva -->
+    <div class="demo-interactiva">
+      <h4>🖱️ Prueba aquí: Crea una carpeta nueva</h4>
+      <p style="font-size:16px;margin-bottom:14px;">Haz clic en los botones en orden para simular la creación de una carpeta:</p>
+
+      <div id="sim-crear" style="position:relative;">
+        <div class="win10-simulador" style="box-shadow:none;">
+          <div class="win10-ribbon">
+            <div class="win10-ribbon-tabs">
+              <div class="win10-tab activo">Inicio</div>
+              <div class="win10-tab">Compartir</div>
+            </div>
+            <div class="win10-ribbon-content">
+              <div class="win10-ribbon-btn" id="btn-nueva-carpeta" onclick="activarCrearCarpeta(0,this)" style="cursor:pointer;background:#fff3cd;border:2px dashed #f9a825;">
+                <span class="rb-icon">📁</span>Nueva<br>carpeta
+              </div>
+              <div class="win10-ribbon-btn"><span class="rb-icon">📋</span>Copiar</div>
+              <div class="win10-ribbon-btn"><span class="rb-icon">🗑️</span>Eliminar</div>
+            </div>
+          </div>
+          <div class="win10-body" style="height:200px;">
+            <div class="win10-panel-principal" id="panel-demo-crear">
+              <div class="win10-vista-iconos">
+                <div class="win10-icono"><div class="ic-imagen">📁</div><div class="ic-nombre">Fotos</div></div>
+                <div class="win10-icono"><div class="ic-imagen">📁</div><div class="ic-nombre">Trabajo</div></div>
+                <div id="carpeta-nueva-demo" class="carpeta-nueva-demo">
+                  <div class="ic-imagen">📁</div>
+                  <input type="text" class="nombre-editable" id="nombre-carpeta-nueva" placeholder="Nueva carpeta" value="Nueva carpeta"
+                    onkeydown="if(event.key==='Enter'){this.blur();document.getElementById('msg-nombre-ok').style.display='block';mostrarMensaje('🎉 ¡Carpeta creada con el nombre: '+this.value, \'ok\');}">
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+        <div id="msg-nombre-ok" style="display:none;background:#e8f5e9;color:#107c10;padding:12px 16px;border-radius:8px;font-size:17px;font-weight:600;margin-top:10px;">
+          ✔ ¡Perfecto! Pulsaste Intro y la carpeta quedó guardada con ese nombre.
+        </div>
+      </div>
+
+      <div style="margin-top:14px;font-size:15px;color:#555;">
+        💡 Después de hacer clic en "Nueva carpeta", el nombre aparece en azul para que lo puedas cambiar. Escribe el nombre que quieras y pulsa <span class="tecla">Intro ↵</span>.
+      </div>
+    </div>
+  </div>
+
+  <!-- SLIDE 3 -->
+  <div class="slide" id="slide-2">
+    <div class="slide-titulo">Cómo cambiar el nombre a una carpeta</div>
+    <div class="slide-subtitulo">Renombrar es muy fácil</div>
+    <div class="explicacion">
+      <p>Si te equivocas con el nombre o quieres cambiarlo, puedes <strong>renombrar</strong> la carpeta en cualquier momento.</p>
+    </div>
+
+    <div style="background:white;border-radius:10px;padding:20px;margin-bottom:16px;box-shadow:0 2px 6px rgba(0,0,0,0.1);">
+      <h4 style="color:#0078d4;margin-bottom:12px;font-size:18px;">Cómo renombrar una carpeta:</h4>
+      <ul class="pasos-lista">
+        <li>Haz <strong>clic una vez</strong> en la carpeta para seleccionarla (se pone en azul)</li>
+        <li>Pulsa la tecla <span class="tecla">F2</span> <em>— o —</em> haz <strong>clic derecho</strong> y elige <strong>"Cambiar nombre"</strong></li>
+        <li>El nombre se pondrá en azul para editar. Borra el nombre antiguo y escribe el nuevo</li>
+        <li>Pulsa <span class="tecla">Intro ↵</span> para confirmar</li>
+      </ul>
+      <div class="advertencia-box">
+        ⚠️ <strong>Importante:</strong> Si pulsas <span class="tecla">Esc</span> en vez de Intro, el nombre NO se guarda y vuelve al nombre anterior. ¡No pasa nada!
+      </div>
+    </div>
+
+    <div class="demo-interactiva">
+      <h4>✏️ Prueba: Renombra esta carpeta</h4>
+      <p style="margin-bottom:12px;font-size:16px;">Haz clic en la carpeta para seleccionarla, luego haz clic en el botón "Cambiar nombre":</p>
+
+      <div style="display:flex;align-items:flex-start;gap:20px;flex-wrap:wrap;">
+        <div class="win10-simulador" style="box-shadow:none;flex:1;min-width:260px;">
+          <div class="win10-body" style="height:160px;">
+            <div class="win10-panel-principal">
+              <div class="win10-vista-iconos">
+                <div class="win10-icono" id="carpeta-renombrar" onclick="seleccionarIcono(this);mostrarMensaje('✔ Carpeta seleccionada. Ahora haz clic en Cambiar nombre', 'info')">
+                  <div class="ic-imagen">📁</div>
+                  <div class="ic-nombre" id="nombre-carpeta-ren" style="cursor:pointer;">Carpeta1</div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+        <div style="display:flex;flex-direction:column;gap:10px;justify-content:center;">
+          <button class="btn-demo" onclick="
+            const ic = document.getElementById('carpeta-renombrar');
+            ic.classList.add('seleccionado');
+            renombrarCarpetaDemo(document.getElementById('nombre-carpeta-ren'));
+          ">✏️ Cambiar nombre</button>
+          <button class="btn-demo" style="background:#555;" onclick="
+            document.getElementById('nombre-carpeta-ren').textContent='Carpeta1';
+            document.getElementById('nombre-carpeta-ren').setAttribute('contenteditable','false');
+            document.getElementById('carpeta-renombrar').classList.remove('seleccionado');
+            mostrarMensaje('Nombre restaurado a Carpeta1', 'info');
+          ">↺ Restablecer</button>
+        </div>
+      </div>
+      <p style="font-size:15px;color:#555;margin-top:10px;">Escribe un nombre nuevo y pulsa <span class="tecla">Intro ↵</span> para guardar.</p>
+    </div>
+  </div>
+
+  <!-- SLIDE 4 -->
+  <div class="slide" id="slide-3">
+    <div class="slide-titulo">Cómo mover y copiar carpetas</div>
+    <div class="slide-subtitulo">Cortar, copiar y pegar — igual que en papel</div>
+    <div class="explicacion">
+      <p><strong>Mover</strong> una carpeta significa quitarla de donde está y ponerla en otro sitio. <strong>Copiar</strong> significa hacer una copia y ponerla en otro sitio (el original queda donde estaba).</p>
+    </div>
+
+    <div style="display:flex;gap:16px;flex-wrap:wrap;margin-bottom:16px;">
+      <div style="flex:1;min-width:240px;background:#e8f4fd;border-radius:10px;padding:18px;border-left:4px solid #0078d4;">
+        <h4 style="color:#0078d4;margin-bottom:10px;">✂️ Para MOVER (Cortar y Pegar)</h4>
+        <ul class="pasos-lista">
+          <li>Selecciona la carpeta (clic)</li>
+          <li>Pulsa <span class="tecla">Ctrl</span> + <span class="tecla">X</span> para <strong>cortar</strong></li>
+          <li>Ve a la carpeta de destino</li>
+          <li>Pulsa <span class="tecla">Ctrl</span> + <span class="tecla">V</span> para <strong>pegar</strong></li>
+        </ul>
+      </div>
+      <div style="flex:1;min-width:240px;background:#e8f5e9;border-radius:10px;padding:18px;border-left:4px solid #107c10;">
+        <h4 style="color:#107c10;margin-bottom:10px;">📋 Para COPIAR (Copiar y Pegar)</h4>
+        <ul class="pasos-lista">
+          <li>Selecciona la carpeta (clic)</li>
+          <li>Pulsa <span class="tecla">Ctrl</span> + <span class="tecla">C</span> para <strong>copiar</strong></li>
+          <li>Ve a la carpeta de destino</li>
+          <li>Pulsa <span class="tecla">Ctrl</span> + <span class="tecla">V</span> para <strong>pegar</strong></li>
+        </ul>
+      </div>
+    </div>
+
+    <div class="tip-box">
+      <strong>💡 También con el clic derecho:</strong> Haz clic derecho sobre la carpeta y verás las opciones "Copiar" y "Cortar" en el menú que aparece.
+    </div>
+    <div class="advertencia-box">
+      <strong>⚠️ Diferencia importante:</strong><br>
+      • <strong>Cortar</strong> (<span class="tecla">Ctrl</span>+<span class="tecla">X</span>) = la carpeta DESAPARECE de donde estaba<br>
+      • <strong>Copiar</strong> (<span class="tecla">Ctrl</span>+<span class="tecla">C</span>) = la carpeta QUEDA donde estaba y también aparece en el destino
+    </div>
+
+    <div class="demo-interactiva" style="margin-top:16px;">
+      <h4>🖱️ Simulación: Mueve una carpeta</h4>
+      <div id="sim-mover" style="display:flex;gap:16px;flex-wrap:wrap;margin-top:10px;">
+        <div style="flex:1;min-width:180px;">
+          <p style="font-size:14px;color:#888;margin-bottom:8px;text-align:center;">Origen</p>
+          <div style="background:#f8f8f8;border:1px solid #ddd;border-radius:8px;padding:12px;min-height:100px;">
+            <div class="win10-icono" id="carpeta-mover-origen" onclick="seleccionarIcono(this);mostrarMensaje('✔ Carpeta seleccionada. Ahora haz clic en Cortar o Copiar', 'info')" style="width:auto;flex-direction:row;padding:8px 12px;gap:10px;">
+              <div class="ic-imagen" style="font-size:28px;">📁</div>
+              <div class="ic-nombre" style="text-align:left;">Mi carpeta</div>
+            </div>
+          </div>
+        </div>
+        <div style="display:flex;flex-direction:column;gap:8px;justify-content:center;align-items:center;">
+          <button class="btn-demo" onclick="cortarMover()">✂️ Cortar<br><small>Ctrl+X</small></button>
+          <button class="btn-demo verde" onclick="copiarMover()">📋 Copiar<br><small>Ctrl+C</small></button>
+        </div>
+        <div style="flex:1;min-width:180px;">
+          <p style="font-size:14px;color:#888;margin-bottom:8px;text-align:center;">Destino (Documentos)</p>
+          <div id="zona-destino" style="background:#f8f8f8;border:2px dashed #ccc;border-radius:8px;padding:12px;min-height:100px;">
+            <p style="font-size:13px;color:#aaa;text-align:center;margin-top:20px;">Vacío — haz clic en Pegar</p>
+          </div>
+          <button class="btn-demo" style="margin-top:8px;width:100%;background:#555;" id="btn-pegar-mover" disabled onclick="pegarMover()">📂 Pegar (Ctrl+V)</button>
+        </div>
+      </div>
+      <div id="msg-mover-resultado" style="display:none;margin-top:12px;padding:12px;border-radius:8px;font-size:16px;font-weight:600;"></div>
+    </div>
+  </div>
+
+  <!-- SLIDE 5 -->
+  <div class="slide" id="slide-4">
+    <div class="slide-titulo">Cómo eliminar una carpeta</div>
+    <div class="slide-subtitulo">Borrar y la Papelera de Reciclaje</div>
+    <div class="explicacion">
+      <p>Cuando eliminas una carpeta, <strong>no desaparece para siempre inmediatamente</strong>. Primero va a la <strong>Papelera de Reciclaje</strong>, que es como una papelera de verdad: puedes recuperar lo que has tirado por error.</p>
+    </div>
+
+    <div style="display:flex;gap:16px;flex-wrap:wrap;margin-bottom:16px;">
+      <div style="flex:1;min-width:220px;background:white;border-radius:10px;padding:18px;box-shadow:0 2px 6px rgba(0,0,0,0.1);">
+        <h4 style="color:#d83b01;margin-bottom:10px;font-size:17px;">🗑️ Cómo eliminar</h4>
+        <ul class="pasos-lista">
+          <li>Selecciona la carpeta (clic)</li>
+          <li>Pulsa la tecla <span class="tecla">Supr</span> (Suprimir) del teclado</li>
+          <li>O haz clic derecho y elige <strong>"Eliminar"</strong></li>
+        </ul>
+      </div>
+      <div style="flex:1;min-width:220px;background:white;border-radius:10px;padding:18px;box-shadow:0 2px 6px rgba(0,0,0,0.1);">
+        <h4 style="color:#107c10;margin-bottom:10px;font-size:17px;">♻️ Recuperar algo eliminado</h4>
+        <ul class="pasos-lista">
+          <li>Haz doble clic en la <strong>Papelera de Reciclaje</strong> del escritorio</li>
+          <li>Busca la carpeta que borraste</li>
+          <li>Haz clic derecho y elige <strong>"Restaurar"</strong></li>
+        </ul>
+      </div>
+    </div>
+
+    <div class="advertencia-box">
+      ⚠️ <strong>¡Atención!</strong> Si vacías la Papelera de Reciclaje, los archivos <strong>sí se borran definitivamente</strong>. ¡No vacíes la papelera si no estás segura!
+    </div>
+
+    <div class="demo-interactiva" style="margin-top:16px;">
+      <h4>🗑️ Prueba: Elimina una carpeta</h4>
+      <div style="display:flex;gap:20px;flex-wrap:wrap;align-items:flex-start;margin-top:10px;">
+        <div style="flex:1;min-width:200px;">
+          <p style="font-size:14px;color:#888;margin-bottom:8px;text-align:center;">Mis Documentos</p>
+          <div style="background:#f8f8f8;border:1px solid #ddd;border-radius:8px;padding:12px;min-height:80px;" id="panel-eliminar">
+            <div class="win10-vista-iconos">
+              <div class="win10-icono" id="carpeta-borrar" onclick="seleccionarIcono(this);mostrarMensaje('✔ Carpeta seleccionada. Ahora haz clic en Eliminar', 'info')">
+                <div class="ic-imagen" id="carpeta-borrar-icon">📁</div>
+                <div class="ic-nombre">Carpeta vieja</div>
+              </div>
+              <div class="win10-icono">
+                <div class="ic-imagen">📁</div>
+                <div class="ic-nombre">Trabajo</div>
+              </div>
+            </div>
+          </div>
+        </div>
+        <div style="display:flex;flex-direction:column;gap:10px;justify-content:center;">
+          <button class="btn-demo rojo" onclick="eliminarDemo()">🗑️ Eliminar (Supr)</button>
+          <button class="btn-demo verde" id="btn-restaurar-demo" disabled onclick="restaurarDemo()">♻️ Restaurar</button>
+        </div>
+        <div style="flex:1;min-width:200px;">
+          <p style="font-size:14px;color:#888;margin-bottom:8px;text-align:center;">🗑️ Papelera de Reciclaje</p>
+          <div id="papelera-demo" style="background:#fff8f8;border:1px solid #eaa;border-radius:8px;padding:12px;min-height:80px;">
+            <p style="font-size:13px;color:#aaa;text-align:center;margin-top:16px;">Vacía</p>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- SLIDE 6 — Resumen -->
+  <div class="slide" id="slide-5">
+    <div class="slide-titulo">Resumen del Módulo 2</div>
+    <div class="slide-subtitulo">¡Muy bien! Esto es lo que has aprendido sobre carpetas</div>
+    <div class="explicacion">
+      <ul class="pasos-lista">
+        <li>Las <strong>carpetas</strong> sirven para organizar archivos, igual que una carpeta física</li>
+        <li><strong>Crear</strong>: clic en "Nueva carpeta" en la cinta, o clic derecho → Nuevo → Carpeta</li>
+        <li><strong>Renombrar</strong>: seleccionar + tecla <span class="tecla">F2</span>, o clic derecho → Cambiar nombre</li>
+        <li><strong>Mover</strong>: <span class="tecla">Ctrl</span>+<span class="tecla">X</span> (cortar) y luego <span class="tecla">Ctrl</span>+<span class="tecla">V</span> (pegar)</li>
+        <li><strong>Copiar</strong>: <span class="tecla">Ctrl</span>+<span class="tecla">C</span> (copiar) y luego <span class="tecla">Ctrl</span>+<span class="tecla">V</span> (pegar)</li>
+        <li><strong>Eliminar</strong>: tecla <span class="tecla">Supr</span> → va a la Papelera. Se puede restaurar desde ahí</li>
+      </ul>
+    </div>
+
+    <div style="display:flex;gap:16px;justify-content:center;margin-top:30px;flex-wrap:wrap;">
+      <a href="modulo1.html" class="btn btn-secundario">← Módulo 1</a>
+      <a href="index.html" class="btn btn-secundario">🏠 Menú</a>
+      <a href="modulo3.html" class="btn btn-primario">Siguiente: Módulo 3 — Archivos →</a>
+    </div>
+  </div>
+
+  <div class="navegacion">
+    <button class="btn btn-secundario" id="btn-anterior" disabled>◀ Anterior</button>
+    <span class="contador-slide" id="contador-slide">1 / 6</span>
+    <button class="btn btn-primario" id="btn-siguiente">Siguiente ▶</button>
+  </div>
+
+</div>
+
+<script src="js/interactivo.js"></script>
+<script>
+let accionMover = null;
+
+function cortarMover() {
+  const orig = document.getElementById('carpeta-mover-origen');
+  orig.style.opacity = '0.4';
+  accionMover = 'cortar';
+  document.getElementById('btn-pegar-mover').disabled = false;
+  mostrarMensaje('✂️ Carpeta cortada. Ahora ve a la carpeta destino y haz clic en Pegar', 'info');
+}
+
+function copiarMover() {
+  accionMover = 'copiar';
+  document.getElementById('btn-pegar-mover').disabled = false;
+  mostrarMensaje('📋 Carpeta copiada. Ahora ve a la carpeta destino y haz clic en Pegar', 'info');
+}
+
+function pegarMover() {
+  if (!accionMover) return;
+  const destino = document.getElementById('zona-destino');
+  destino.innerHTML = '';
+  destino.style.borderStyle = 'solid';
+  destino.style.borderColor = '#107c10';
+  const icono = document.createElement('div');
+  icono.className = 'win10-icono';
+  icono.style.cssText = 'flex-direction:row;padding:8px 12px;gap:10px;width:auto;';
+  icono.innerHTML = '<div class="ic-imagen" style="font-size:28px;">📁</div><div class="ic-nombre" style="text-align:left;">Mi carpeta</div>';
+  destino.appendChild(icono);
+  const msg = document.getElementById('msg-mover-resultado');
+  msg.style.display = 'block';
+  if (accionMover === 'cortar') {
+    msg.style.background = '#e8f5e9'; msg.style.color = '#107c10';
+    msg.textContent = '✔ ¡Perfecto! La carpeta se movió a Documentos. Desapareció del origen.';
+  } else {
+    msg.style.background = '#e8f4fd'; msg.style.color = '#0078d4';
+    msg.textContent = '✔ ¡Muy bien! Se copió la carpeta a Documentos. El original sigue donde estaba.';
+    document.getElementById('carpeta-mover-origen').style.opacity = '1';
+  }
+  document.getElementById('btn-pegar-mover').disabled = true;
+  accionMover = null;
+}
+
+function eliminarDemo() {
+  const carpeta = document.getElementById('carpeta-borrar');
+  if (!carpeta.classList.contains('seleccionado')) {
+    mostrarMensaje('Primero selecciona la carpeta haciendo clic en ella', 'error');
+    return;
+  }
+  carpeta.classList.add('icono-cayendo');
+  setTimeout(() => {
+    carpeta.style.display = 'none';
+    const papelera = document.getElementById('papelera-demo');
+    papelera.innerHTML = '';
+    const ic = document.createElement('div');
+    ic.className = 'win10-icono';
+    ic.innerHTML = '<div class="ic-imagen" style="font-size:28px;">📁</div><div class="ic-nombre">Carpeta vieja</div>';
+    papelera.appendChild(ic);
+    document.getElementById('btn-restaurar-demo').disabled = false;
+    mostrarMensaje('🗑️ Carpeta movida a la Papelera. Puedes restaurarla si fue un error.', 'info');
+  }, 500);
+}
+
+function restaurarDemo() {
+  const papelera = document.getElementById('papelera-demo');
+  papelera.innerHTML = '<p style="font-size:13px;color:#aaa;text-align:center;margin-top:16px;">Vacía</p>';
+  const carpeta = document.getElementById('carpeta-borrar');
+  carpeta.style.display = 'flex';
+  carpeta.classList.remove('icono-cayendo', 'seleccionado');
+  carpeta.style.opacity = '1';
+  document.getElementById('btn-restaurar-demo').disabled = true;
+  mostrarMensaje('♻️ ¡Carpeta restaurada! Volvió a Documentos.', 'ok');
+}
+
+document.addEventListener('DOMContentLoaded', () => {
+  pasoCrearCarpeta = 0;
+  document.getElementById('carpeta-nueva-demo').style.display = 'none';
+});
+</script>
+</body>
+</html>

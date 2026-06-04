@@ -1,0 +1,345 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta name="author" content="Arkaitz Belaza">
+<title>Juego 1 — ¡Organiza tus archivos!</title>
+<link rel="stylesheet" href="css/estilos.css">
+<style>
+  body { background: linear-gradient(160deg, #e8ffe8 0%, #f0fff0 100%); }
+  .juego-cabecera {
+    text-align: center;
+    padding: 30px 20px 10px;
+  }
+  .juego-cabecera h1 { font-size: 30px; color: #107c10; margin-bottom: 6px; }
+  .juego-cabecera p { font-size: 18px; color: #555; }
+  .instrucciones {
+    background: white;
+    border-radius: 10px;
+    padding: 18px 22px;
+    margin: 0 auto 20px;
+    max-width: 860px;
+    box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+    font-size: 17px;
+    line-height: 1.6;
+  }
+  .instrucciones strong { color: #107c10; }
+  .marcador {
+    text-align: center;
+    font-size: 20px;
+    font-weight: 700;
+    color: #107c10;
+    margin-bottom: 16px;
+  }
+  .marcador span {
+    background: white;
+    border-radius: 20px;
+    padding: 6px 18px;
+    box-shadow: 0 2px 6px rgba(0,0,0,0.15);
+  }
+
+  /* Zona de juego */
+  .zona-juego {
+    max-width: 900px;
+    margin: 0 auto;
+    padding: 0 16px 40px;
+  }
+  .pool-titulo {
+    font-size: 18px;
+    font-weight: 700;
+    color: #333;
+    margin-bottom: 12px;
+    text-align: center;
+  }
+  .pool-archivos {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 10px;
+    background: white;
+    border-radius: 12px;
+    padding: 18px;
+    box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+    min-height: 80px;
+    justify-content: center;
+    margin-bottom: 24px;
+  }
+  .archivo-arrastrable {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    padding: 10px 16px;
+    background: #f0f7ff;
+    border: 2px solid #b3d6f5;
+    border-radius: 8px;
+    cursor: grab;
+    font-size: 16px;
+    transition: all 0.2s;
+    user-select: none;
+  }
+  .archivo-arrastrable:hover { background: #dceefb; transform: scale(1.04); box-shadow: 0 3px 10px rgba(0,120,212,0.2); }
+  .archivo-arrastrable.arrastrando { opacity: 0.35; transform: scale(0.95); }
+  .archivo-arrastrable .af-icon { font-size: 26px; }
+  .archivo-arrastrable .af-nombre { font-weight: 500; }
+  .archivo-colocado-ok {
+    opacity: 0.4;
+    cursor: not-allowed;
+    pointer-events: none;
+    background: #e8f5e9 !important;
+    border-color: #107c10 !important;
+  }
+
+  /* Carpetas destino */
+  .carpetas-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+    gap: 16px;
+    margin-bottom: 24px;
+  }
+  .carpeta-drop-zona {
+    background: #fffde7;
+    border: 2.5px dashed #f9a825;
+    border-radius: 12px;
+    padding: 14px 12px;
+    min-height: 140px;
+    transition: all 0.2s;
+  }
+  .carpeta-drop-zona.sobre {
+    background: #fff9c4;
+    border-color: #f57f17;
+    border-style: solid;
+    transform: scale(1.02);
+  }
+  .carpeta-drop-zona.ok-flash {
+    background: #e8f5e9;
+    border-color: #107c10;
+    border-style: solid;
+  }
+  .carpeta-drop-zona.error-flash {
+    background: #fde7e0;
+    border-color: #d83b01;
+    border-style: solid;
+  }
+  .carpeta-header {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    margin-bottom: 10px;
+    font-weight: 700;
+    font-size: 16px;
+    color: #444;
+  }
+  .carpeta-header .ch-icon { font-size: 26px; }
+  .archivos-en-carpeta {
+    display: flex;
+    flex-direction: column;
+    gap: 5px;
+  }
+  .archivo-dentro {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    background: white;
+    border: 1px solid #ddd;
+    border-radius: 5px;
+    padding: 5px 8px;
+    font-size: 13px;
+    animation: aparecer 0.3s ease;
+  }
+  @keyframes aparecer {
+    from { opacity: 0; transform: translateY(-6px); }
+    to { opacity: 1; transform: translateY(0); }
+  }
+
+  /* Pantalla final */
+  .pantalla-final {
+    display: none;
+    text-align: center;
+    background: white;
+    border-radius: 16px;
+    padding: 40px 30px;
+    max-width: 500px;
+    margin: 30px auto;
+    box-shadow: 0 6px 24px rgba(0,0,0,0.15);
+  }
+  .pantalla-final h2 { font-size: 28px; color: #107c10; margin-bottom: 12px; }
+  .pantalla-final .pf-icono { font-size: 70px; margin-bottom: 16px; }
+  .pantalla-final .pf-puntos { font-size: 52px; font-weight: 700; color: #107c10; }
+  .pantalla-final p { font-size: 18px; color: #555; margin: 10px 0; }
+  .botones-final { display: flex; gap: 12px; justify-content: center; margin-top: 20px; flex-wrap: wrap; }
+</style>
+</head>
+<body>
+
+<div class="taller-header">
+  <h1>🗃️ Juego 1 — ¡Organiza tus archivos!</h1>
+  <span class="modulo-badge">🎮 Actividad</span>
+</div>
+
+<div class="juego-cabecera">
+  <h1>¡Pon cada archivo en su carpeta!</h1>
+  <p>Arrastra cada archivo a la carpeta donde debería ir</p>
+</div>
+
+<div class="instrucciones">
+  📌 <strong>Instrucciones:</strong> Abajo verás archivos sueltos. Tienes que arrastrarlos con el ratón hasta la carpeta correcta. Si aciertas, el archivo quedará dentro de la carpeta. Si te equivocas, el archivo vuelve y puedes intentarlo de nuevo.
+  <br><br>
+  🖱️ <strong>Cómo arrastrar:</strong> Haz clic sobre el archivo, mantén pulsado el botón del ratón, mueve el ratón hasta la carpeta y suelta.
+</div>
+
+<div class="zona-juego">
+  <div class="marcador">Archivos colocados: <span id="contador-aciertos">0</span> / <span id="total-archivos">10</span></div>
+
+  <div class="pool-titulo">📂 Archivos para organizar — Arrástralos a su carpeta</div>
+  <div class="pool-archivos" id="pool-archivos">
+    <div class="archivo-arrastrable" draggable="true" data-categoria="fotos" id="a1">
+      <span class="af-icon">🖼️</span><span class="af-nombre">vacaciones.jpg</span>
+    </div>
+    <div class="archivo-arrastrable" draggable="true" data-categoria="documentos" id="a2">
+      <span class="af-icon">📄</span><span class="af-nombre">carta.docx</span>
+    </div>
+    <div class="archivo-arrastrable" draggable="true" data-categoria="musica" id="a3">
+      <span class="af-icon">🎵</span><span class="af-nombre">cancion.mp3</span>
+    </div>
+    <div class="archivo-arrastrable" draggable="true" data-categoria="fotos" id="a4">
+      <span class="af-icon">🖼️</span><span class="af-nombre">familia.jpg</span>
+    </div>
+    <div class="archivo-arrastrable" draggable="true" data-categoria="documentos" id="a5">
+      <span class="af-icon">📕</span><span class="af-nombre">recibo.pdf</span>
+    </div>
+    <div class="archivo-arrastrable" draggable="true" data-categoria="videos" id="a6">
+      <span class="af-icon">🎬</span><span class="af-nombre">cumpleaños.mp4</span>
+    </div>
+    <div class="archivo-arrastrable" draggable="true" data-categoria="musica" id="a7">
+      <span class="af-icon">🎵</span><span class="af-nombre">favorita.mp3</span>
+    </div>
+    <div class="archivo-arrastrable" draggable="true" data-categoria="documentos" id="a8">
+      <span class="af-icon">📊</span><span class="af-nombre">gastos.xlsx</span>
+    </div>
+    <div class="archivo-arrastrable" draggable="true" data-categoria="fotos" id="a9">
+      <span class="af-icon">🖼️</span><span class="af-nombre">perro.png</span>
+    </div>
+    <div class="archivo-arrastrable" draggable="true" data-categoria="videos" id="a10">
+      <span class="af-icon">🎬</span><span class="af-nombre">viaje.mp4</span>
+    </div>
+  </div>
+
+  <div class="carpetas-grid">
+    <div class="carpeta-drop-zona" data-categoria="fotos" id="zona-fotos">
+      <div class="carpeta-header">
+        <span class="ch-icon">📁</span>
+        <span>Mis Fotos</span>
+      </div>
+      <div class="archivos-en-carpeta" id="dentro-fotos"></div>
+    </div>
+    <div class="carpeta-drop-zona" data-categoria="documentos" id="zona-documentos">
+      <div class="carpeta-header">
+        <span class="ch-icon">📁</span>
+        <span>Documentos</span>
+      </div>
+      <div class="archivos-en-carpeta" id="dentro-documentos"></div>
+    </div>
+    <div class="carpeta-drop-zona" data-categoria="musica" id="zona-musica">
+      <div class="carpeta-header">
+        <span class="ch-icon">📁</span>
+        <span>Música</span>
+      </div>
+      <div class="archivos-en-carpeta" id="dentro-musica"></div>
+    </div>
+    <div class="carpeta-drop-zona" data-categoria="videos" id="zona-videos">
+      <div class="carpeta-header">
+        <span class="ch-icon">📁</span>
+        <span>Vídeos</span>
+      </div>
+      <div class="archivos-en-carpeta" id="dentro-videos"></div>
+    </div>
+  </div>
+
+  <div class="pantalla-final" id="pantalla-final">
+    <div class="pf-icono" id="pf-icono">🎉</div>
+    <h2>¡Juego completado!</h2>
+    <div class="pf-puntos" id="pf-puntos">10/10</div>
+    <p id="pf-mensaje">¡Perfecto! Has organizado todos los archivos correctamente.</p>
+    <div class="botones-final">
+      <button class="btn btn-secundario" onclick="reiniciarJuego()">🔄 Jugar otra vez</button>
+      <a href="juego2.html" class="btn btn-primario">Siguiente: Quiz →</a>
+      <a href="index.html" class="btn btn-secundario">🏠 Menú</a>
+    </div>
+  </div>
+</div>
+
+<script src="js/interactivo.js"></script>
+<script>
+let archivoArrastrando = null;
+let aciertos = 0;
+const total = 10;
+
+document.addEventListener('DOMContentLoaded', () => {
+  document.querySelectorAll('.archivo-arrastrable').forEach(el => {
+    el.addEventListener('dragstart', (e) => {
+      archivoArrastrando = el;
+      el.classList.add('arrastrando');
+      e.dataTransfer.effectAllowed = 'move';
+    });
+    el.addEventListener('dragend', () => {
+      el.classList.remove('arrastrando');
+    });
+  });
+
+  document.querySelectorAll('.carpeta-drop-zona').forEach(zona => {
+    zona.addEventListener('dragover', e => { e.preventDefault(); zona.classList.add('sobre'); });
+    zona.addEventListener('dragleave', () => zona.classList.remove('sobre'));
+    zona.addEventListener('drop', e => {
+      e.preventDefault();
+      zona.classList.remove('sobre');
+      if (!archivoArrastrando) return;
+      const catArchivo = archivoArrastrando.dataset.categoria;
+      const catZona = zona.dataset.categoria;
+      if (catArchivo === catZona) {
+        aciertos++;
+        document.getElementById('contador-aciertos').textContent = aciertos;
+        zona.classList.add('ok-flash');
+        setTimeout(() => zona.classList.remove('ok-flash'), 700);
+        const icono = archivoArrastrando.querySelector('.af-icon').textContent;
+        const nombre = archivoArrastrando.querySelector('.af-nombre').textContent;
+        const div = document.createElement('div');
+        div.className = 'archivo-dentro';
+        div.innerHTML = `<span>${icono}</span><span>${nombre}</span>`;
+        zona.querySelector('.archivos-en-carpeta').appendChild(div);
+        archivoArrastrando.classList.add('archivo-colocado-ok');
+        mostrarMensaje('✔ ¡Correcto! ' + nombre + ' va en ' + zona.querySelector('.carpeta-header span:last-child').textContent, 'ok');
+        if (aciertos === total) {
+          setTimeout(mostrarFinal, 1000);
+        }
+      } else {
+        zona.classList.add('error-flash');
+        setTimeout(() => zona.classList.remove('error-flash'), 600);
+        mostrarMensaje('✖ Ese no es el sitio correcto. Inténtalo en otra carpeta.', 'error');
+      }
+      archivoArrastrando = null;
+    });
+  });
+});
+
+function mostrarFinal() {
+  document.getElementById('pantalla-final').style.display = 'block';
+  document.getElementById('pf-puntos').textContent = aciertos + '/' + total;
+  if (aciertos === total) {
+    document.getElementById('pf-icono').textContent = '🏆';
+    document.getElementById('pf-mensaje').textContent = '¡Perfecto! Has organizado todos los archivos correctamente. ¡Eres una experta!';
+  } else if (aciertos >= 7) {
+    document.getElementById('pf-icono').textContent = '🌟';
+    document.getElementById('pf-mensaje').textContent = '¡Muy bien! La mayoría están bien organizados.';
+  } else {
+    document.getElementById('pf-icono').textContent = '💪';
+    document.getElementById('pf-mensaje').textContent = 'Buen intento. Puedes volver a intentarlo para mejorar.';
+  }
+  document.getElementById('pantalla-final').scrollIntoView({ behavior: 'smooth', block: 'center' });
+}
+
+function reiniciarJuego() {
+  location.reload();
+}
+</script>
+</body>
+</html>

@@ -1,0 +1,531 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta name="author" content="Arkaitz Belaza">
+<title>Módulo 3 — Archivos</title>
+<link rel="stylesheet" href="css/estilos.css">
+<style>
+  .tipos-archivos {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(160px, 1fr));
+    gap: 12px;
+    margin: 16px 0;
+  }
+  .tipo-archivo-card {
+    background: white;
+    border-radius: 10px;
+    padding: 16px 12px;
+    text-align: center;
+    box-shadow: 0 2px 6px rgba(0,0,0,0.1);
+    border-top: 3px solid #0078d4;
+    transition: transform 0.2s;
+    cursor: default;
+  }
+  .tipo-archivo-card:hover { transform: translateY(-3px); }
+  .tipo-archivo-card .ta-icono { font-size: 36px; margin-bottom: 8px; }
+  .tipo-archivo-card .ta-extension {
+    font-family: monospace;
+    font-size: 14px;
+    background: #f0f0f0;
+    border-radius: 4px;
+    padding: 2px 8px;
+    color: #555;
+    margin-bottom: 6px;
+    display: inline-block;
+  }
+  .tipo-archivo-card .ta-nombre { font-size: 15px; font-weight: 600; color: #333; margin-bottom: 4px; }
+  .tipo-archivo-card .ta-desc { font-size: 13px; color: #777; line-height: 1.4; }
+
+  .extension-demo {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    background: #f5f5f5;
+    border-radius: 6px;
+    padding: 6px 12px;
+    font-size: 16px;
+    font-family: monospace;
+    border: 1px solid #ddd;
+  }
+  .ext-nombre { color: #222; }
+  .ext-punto { color: #aaa; }
+  .ext-tipo { color: #d83b01; font-weight: 700; }
+
+  .proceso-guardar {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    flex-wrap: wrap;
+    margin: 16px 0;
+  }
+  .proceso-paso {
+    background: white;
+    border: 2px solid #0078d4;
+    border-radius: 10px;
+    padding: 14px 16px;
+    text-align: center;
+    flex: 1;
+    min-width: 120px;
+    font-size: 15px;
+  }
+  .proceso-paso .pp-icono { font-size: 28px; margin-bottom: 6px; }
+  .proceso-flecha { font-size: 22px; color: #0078d4; font-weight: 700; flex-shrink: 0; }
+
+  .ventana-guardar {
+    background: #f3f3f3;
+    border: 1px solid #aaa;
+    border-radius: 6px;
+    box-shadow: 0 6px 20px rgba(0,0,0,0.3);
+    width: 100%;
+    max-width: 500px;
+    margin: 16px auto;
+    font-size: 13px;
+  }
+  .vg-barra {
+    background: #0078d4;
+    color: white;
+    padding: 8px 12px;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    border-radius: 4px 4px 0 0;
+    font-size: 14px;
+    font-weight: 600;
+  }
+  .vg-cuerpo { padding: 16px; }
+  .vg-fila {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    margin-bottom: 12px;
+  }
+  .vg-etiqueta { width: 100px; color: #555; font-size: 13px; text-align: right; flex-shrink: 0; }
+  .vg-campo {
+    flex: 1;
+    border: 1px solid #bbb;
+    border-radius: 3px;
+    padding: 5px 9px;
+    font-size: 13px;
+    background: white;
+  }
+  .vg-campo.activo { border-color: #0078d4; outline: 1px solid #0078d4; }
+  .vg-botones { display: flex; justify-content: flex-end; gap: 8px; margin-top: 14px; }
+  .vg-btn {
+    padding: 6px 20px;
+    border: 1px solid #ccc;
+    border-radius: 3px;
+    font-size: 13px;
+    cursor: pointer;
+    background: #f3f3f3;
+  }
+  .vg-btn.primario { background: #0078d4; color: white; border-color: #0078d4; }
+</style>
+</head>
+<body>
+
+<div class="taller-header">
+  <h1>📄 Módulo 3 — Archivos</h1>
+  <span class="modulo-badge">Módulo 3 de 3</span>
+</div>
+<div class="progreso-bar">
+  <div class="progreso-fill" id="progreso-fill" style="width:14%"></div>
+</div>
+<div class="progreso-texto" id="progreso-texto">Progreso: 14%</div>
+
+<div class="contenido">
+
+  <!-- SLIDE 1 -->
+  <div class="slide activo" id="slide-0">
+    <div class="slide-titulo">¿Qué es un archivo?</div>
+    <div class="slide-subtitulo">La diferencia entre archivos y carpetas</div>
+    <div class="explicacion">
+      <p>Un <strong>archivo</strong> es cualquier cosa que puedes <strong>abrir y usar</strong>: una carta que escribiste, una foto, una canción, un vídeo, un PDF...</p>
+      <p>La diferencia con una carpeta:</p>
+    </div>
+
+    <div style="display:flex;gap:16px;flex-wrap:wrap;margin-bottom:20px;">
+      <div style="flex:1;min-width:200px;background:#e8f4fd;border-radius:10px;padding:20px;text-align:center;">
+        <div style="font-size:52px;margin-bottom:10px;">📁</div>
+        <strong style="font-size:17px;color:#0078d4;">CARPETA</strong>
+        <p style="font-size:15px;color:#555;margin-top:8px;line-height:1.5;">Es un <strong>contenedor</strong>. No tiene contenido propio, pero dentro puedes guardar archivos y otras carpetas. No puedes "abrirla" para ver texto o imágenes, solo para ver lo que hay dentro.</p>
+      </div>
+      <div style="flex:1;min-width:200px;background:#e8f5e9;border-radius:10px;padding:20px;text-align:center;">
+        <div style="font-size:52px;margin-bottom:10px;">📄</div>
+        <strong style="font-size:17px;color:#107c10;">ARCHIVO</strong>
+        <p style="font-size:15px;color:#555;margin-top:8px;line-height:1.5;">Tiene <strong>contenido real</strong>: texto, una imagen, música... Al hacer doble clic, se abre con el programa adecuado y puedes ver o usar ese contenido.</p>
+      </div>
+    </div>
+
+    <div class="win10-simulador">
+      <div class="win10-body" style="height:180px;">
+        <div class="win10-panel-principal">
+          <div class="win10-vista-iconos">
+            <div class="win10-icono" onclick="seleccionarIcono(this);mostrarMensaje('📁 CARPETA — contiene archivos. Doble clic para entrar y ver el contenido.', 'info')">
+              <div class="ic-imagen">📁</div>
+              <div class="ic-nombre">Fotos 2024</div>
+            </div>
+            <div class="win10-icono" onclick="seleccionarIcono(this);mostrarMensaje('📄 ARCHIVO Word — doble clic lo abre en Microsoft Word.', 'info')">
+              <div class="ic-imagen">📄</div>
+              <div class="ic-nombre">carta.docx</div>
+            </div>
+            <div class="win10-icono" onclick="seleccionarIcono(this);mostrarMensaje('🖼️ ARCHIVO de imagen — doble clic lo abre en el visor de fotos.', 'info')">
+              <div class="ic-imagen">🖼️</div>
+              <div class="ic-nombre">foto.jpg</div>
+            </div>
+            <div class="win10-icono" onclick="seleccionarIcono(this);mostrarMensaje('📁 CARPETA — esta también es una carpeta, no un archivo.', 'info')">
+              <div class="ic-imagen">📁</div>
+              <div class="ic-nombre">Trabajo</div>
+            </div>
+            <div class="win10-icono" onclick="seleccionarIcono(this);mostrarMensaje('📕 ARCHIVO PDF — doble clic lo abre en Adobe o en el navegador.', 'info')">
+              <div class="ic-imagen">📕</div>
+              <div class="ic-nombre">manual.pdf</div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+    <p style="font-size:15px;color:#666;text-align:center;margin-top:10px;">💡 Haz clic en cada icono para ver si es archivo o carpeta</p>
+  </div>
+
+  <!-- SLIDE 2 -->
+  <div class="slide" id="slide-1">
+    <div class="slide-titulo">Tipos de archivos más comunes</div>
+    <div class="slide-subtitulo">Cada tipo de archivo tiene su propio icono y extensión</div>
+    <div class="explicacion">
+      <p>Los archivos tienen un <strong>nombre</strong> y una <strong>extensión</strong>. La extensión (las letras después del punto) indica el <strong>tipo de archivo</strong> que es.</p>
+      <p>Ejemplo: <span class="extension-demo"><span class="ext-nombre">carta</span><span class="ext-punto">.</span><span class="ext-tipo">docx</span></span> → el nombre es "carta" y la extensión ".docx" indica que es un documento de Word.</p>
+    </div>
+
+    <div class="tipos-archivos">
+      <div class="tipo-archivo-card">
+        <div class="ta-icono">📄</div>
+        <div class="ta-extension">.docx</div>
+        <div class="ta-nombre">Word</div>
+        <div class="ta-desc">Documentos de texto (cartas, informes...)</div>
+      </div>
+      <div class="tipo-archivo-card" style="border-top-color:#e74c3c;">
+        <div class="ta-icono">📕</div>
+        <div class="ta-extension">.pdf</div>
+        <div class="ta-nombre">PDF</div>
+        <div class="ta-desc">Documentos que no se pueden editar fácilmente</div>
+      </div>
+      <div class="tipo-archivo-card" style="border-top-color:#27ae60;">
+        <div class="ta-icono">📊</div>
+        <div class="ta-extension">.xlsx</div>
+        <div class="ta-nombre">Excel</div>
+        <div class="ta-desc">Tablas y números (hojas de cálculo)</div>
+      </div>
+      <div class="tipo-archivo-card" style="border-top-color:#f39c12;">
+        <div class="ta-icono">🖼️</div>
+        <div class="ta-extension">.jpg</div>
+        <div class="ta-nombre">Foto/Imagen</div>
+        <div class="ta-desc">Fotografías e imágenes</div>
+      </div>
+      <div class="tipo-archivo-card" style="border-top-color:#9b59b6;">
+        <div class="ta-icono">🖼️</div>
+        <div class="ta-extension">.png</div>
+        <div class="ta-nombre">Imagen PNG</div>
+        <div class="ta-desc">Imágenes con fondo transparente</div>
+      </div>
+      <div class="tipo-archivo-card" style="border-top-color:#1abc9c;">
+        <div class="ta-icono">🎵</div>
+        <div class="ta-extension">.mp3</div>
+        <div class="ta-nombre">Música</div>
+        <div class="ta-desc">Archivos de audio y canciones</div>
+      </div>
+      <div class="tipo-archivo-card" style="border-top-color:#e67e22;">
+        <div class="ta-icono">🎬</div>
+        <div class="ta-extension">.mp4</div>
+        <div class="ta-nombre">Vídeo</div>
+        <div class="ta-desc">Películas, vídeos grabados</div>
+      </div>
+      <div class="tipo-archivo-card" style="border-top-color:#555;">
+        <div class="ta-icono">📦</div>
+        <div class="ta-extension">.zip</div>
+        <div class="ta-nombre">Comprimido</div>
+        <div class="ta-desc">Varios archivos empaquetados juntos</div>
+      </div>
+    </div>
+
+    <div class="tip-box">
+      <strong>💡 Para recordar:</strong> Si no reconoces un archivo, fíjate en las letras después del punto. Esas letras te dicen de qué tipo es.
+    </div>
+  </div>
+
+  <!-- SLIDE 3 -->
+  <div class="slide" id="slide-2">
+    <div class="slide-titulo">Abrir un archivo</div>
+    <div class="slide-subtitulo">Doble clic es todo lo que necesitas</div>
+    <div class="explicacion">
+      <p>Para abrir un archivo, simplemente haz <strong>doble clic</strong> sobre él. Windows abrirá automáticamente el programa adecuado.</p>
+      <p>Por ejemplo: si haces doble clic en una foto, se abre el visor de fotos. Si haces doble clic en un documento Word, se abre Microsoft Word.</p>
+      <div class="tip-box">
+        <strong>💡 ¿Y si el archivo no se abre bien?</strong> Haz clic derecho sobre el archivo y elige <strong>"Abrir con"</strong>. Podrás elegir qué programa quieres usar para abrirlo.
+      </div>
+    </div>
+
+    <div class="win10-simulador">
+      <div class="win10-body" style="height:200px;">
+        <div class="win10-panel-principal">
+          <p style="font-size:13px;color:#888;margin-bottom:10px;padding:4px;">Haz <strong>doble clic</strong> en un archivo para "abrirlo":</p>
+          <div class="win10-vista-iconos">
+            <div class="win10-icono" ondblclick="simularAbrirArchivo('📄 Microsoft Word se está abriendo...', 'carta.docx')">
+              <div class="ic-imagen">📄</div>
+              <div class="ic-nombre">carta.docx</div>
+            </div>
+            <div class="win10-icono" ondblclick="simularAbrirArchivo('🖼️ Abriendo foto con el Visor de Fotos de Windows...', 'foto.jpg')">
+              <div class="ic-imagen">🖼️</div>
+              <div class="ic-nombre">foto.jpg</div>
+            </div>
+            <div class="win10-icono" ondblclick="simularAbrirArchivo('📕 Abriendo PDF en el navegador Edge...', 'manual.pdf')">
+              <div class="ic-imagen">📕</div>
+              <div class="ic-nombre">manual.pdf</div>
+            </div>
+            <div class="win10-icono" ondblclick="simularAbrirArchivo('🎵 Abriendo en el Reproductor de Windows Media...', 'cancion.mp3')">
+              <div class="ic-imagen">🎵</div>
+              <div class="ic-nombre">cancion.mp3</div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+    <p style="font-size:15px;color:#666;text-align:center;margin-top:8px;">💡 Haz <strong>doble clic</strong> (dos clics rápidos) en cada archivo</p>
+  </div>
+
+  <!-- SLIDE 4 -->
+  <div class="slide" id="slide-3">
+    <div class="slide-titulo">Guardar un archivo</div>
+    <div class="slide-subtitulo">Muy importante: guardar el trabajo antes de cerrar</div>
+    <div class="explicacion">
+      <p><strong>Guardar</strong> significa grabar los cambios que has hecho en un archivo para que no se pierdan cuando cierras el programa.</p>
+      <p>Si no guardas, todo lo que hayas escrito o cambiado <strong>desaparece cuando cierras el programa</strong>.</p>
+    </div>
+
+    <div class="proceso-guardar">
+      <div class="proceso-paso">
+        <div class="pp-icono">📄</div>
+        <strong>1. Trabajas</strong><br>
+        <small>Escribes o editas</small>
+      </div>
+      <div class="proceso-flecha">→</div>
+      <div class="proceso-paso">
+        <div class="pp-icono">💾</div>
+        <strong>2. Guardas</strong><br>
+        <small>Ctrl+S</small>
+      </div>
+      <div class="proceso-flecha">→</div>
+      <div class="proceso-paso">
+        <div class="pp-icono">✅</div>
+        <strong>3. Seguro</strong><br>
+        <small>No se pierde</small>
+      </div>
+    </div>
+
+    <div style="display:flex;gap:14px;flex-wrap:wrap;margin-bottom:16px;">
+      <div style="flex:1;min-width:200px;background:#e8f4fd;border-radius:10px;padding:16px;border-left:4px solid #0078d4;">
+        <h4 style="color:#0078d4;margin-bottom:8px;">⌨️ Guardar rápido</h4>
+        <p style="font-size:16px;"><span class="tecla">Ctrl</span> + <span class="tecla">S</span></p>
+        <p style="font-size:14px;color:#555;margin-top:6px;">Guarda el archivo con el mismo nombre y en el mismo sitio. La forma más rápida.</p>
+      </div>
+      <div style="flex:1;min-width:200px;background:#e8f4fd;border-radius:10px;padding:16px;border-left:4px solid #107c10;">
+        <h4 style="color:#107c10;margin-bottom:8px;">📁 Guardar como...</h4>
+        <p style="font-size:16px;"><span class="tecla">Ctrl</span> + <span class="tecla">Mayús</span> + <span class="tecla">S</span></p>
+        <p style="font-size:14px;color:#555;margin-top:6px;">Guarda el archivo con un <strong>nombre nuevo</strong> o en una <strong>carpeta diferente</strong>.</p>
+      </div>
+    </div>
+
+    <!-- Simulación ventana Guardar como -->
+    <div class="demo-interactiva">
+      <h4>💾 Simulación: Ventana "Guardar como"</h4>
+      <p style="font-size:15px;margin-bottom:12px;">Así se ve la ventana cuando guardas un archivo. Haz clic en "Guardar":</p>
+      <div class="ventana-guardar">
+        <div class="vg-barra">
+          <span>💾 Guardar como</span>
+          <span style="cursor:pointer;opacity:0.7;">✕</span>
+        </div>
+        <div class="vg-cuerpo">
+          <div class="vg-fila">
+            <span class="vg-etiqueta">Guardar en:</span>
+            <div class="vg-campo" style="display:flex;align-items:center;gap:6px;cursor:pointer;">
+              <span>📁</span>
+              <span>Documentos</span>
+            </div>
+          </div>
+          <div class="vg-fila">
+            <span class="vg-etiqueta">Nombre:</span>
+            <input type="text" class="vg-campo activo" id="nombre-guardar-sim" value="Mi carta" style="border-color:#0078d4;">
+          </div>
+          <div class="vg-fila">
+            <span class="vg-etiqueta">Tipo:</span>
+            <div class="vg-campo">Documento Word (.docx)</div>
+          </div>
+          <div class="vg-botones">
+            <button class="vg-btn" onclick="mostrarMensaje('Has cancelado sin guardar. Los cambios no se han guardado.', 'error')">Cancelar</button>
+            <button class="vg-btn primario" onclick="simularGuardar()">Guardar</button>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div class="advertencia-box">
+      ⚠️ <strong>Consejo de oro:</strong> Guarda tu trabajo cada 5-10 minutos con <span class="tecla">Ctrl</span>+<span class="tecla">S</span>. Si el ordenador se apaga de repente, perderás solo los últimos cambios, no todo el trabajo.
+    </div>
+  </div>
+
+  <!-- SLIDE 5 -->
+  <div class="slide" id="slide-4">
+    <div class="slide-titulo">Copiar y pegar archivos</div>
+    <div class="slide-subtitulo">Las mismas teclas que para las carpetas</div>
+    <div class="explicacion">
+      <p>Copiar y mover archivos funciona <strong>exactamente igual que con las carpetas</strong>. Ya lo aprendiste en el Módulo 2, así que esto te será fácil.</p>
+    </div>
+
+    <div style="background:white;border-radius:10px;padding:22px;box-shadow:0 2px 6px rgba(0,0,0,0.1);margin-bottom:16px;">
+      <table style="width:100%;border-collapse:collapse;font-size:16px;">
+        <tr style="background:#f0f7ff;">
+          <th style="padding:12px 16px;text-align:left;border-bottom:2px solid #0078d4;color:#0078d4;">Acción</th>
+          <th style="padding:12px 16px;text-align:left;border-bottom:2px solid #0078d4;color:#0078d4;">Teclas</th>
+          <th style="padding:12px 16px;text-align:left;border-bottom:2px solid #0078d4;color:#0078d4;">Qué hace</th>
+        </tr>
+        <tr style="border-bottom:1px solid #eee;">
+          <td style="padding:12px 16px;">Copiar</td>
+          <td style="padding:12px 16px;"><span class="tecla">Ctrl</span> + <span class="tecla">C</span></td>
+          <td style="padding:12px 16px;">El archivo queda en los dos sitios</td>
+        </tr>
+        <tr style="background:#f9f9f9;border-bottom:1px solid #eee;">
+          <td style="padding:12px 16px;">Cortar (mover)</td>
+          <td style="padding:12px 16px;"><span class="tecla">Ctrl</span> + <span class="tecla">X</span></td>
+          <td style="padding:12px 16px;">El archivo se mueve, desaparece del sitio original</td>
+        </tr>
+        <tr style="border-bottom:1px solid #eee;">
+          <td style="padding:12px 16px;">Pegar</td>
+          <td style="padding:12px 16px;"><span class="tecla">Ctrl</span> + <span class="tecla">V</span></td>
+          <td style="padding:12px 16px;">El archivo aparece en el nuevo sitio</td>
+        </tr>
+        <tr style="background:#f9f9f9;">
+          <td style="padding:12px 16px;">Deshacer</td>
+          <td style="padding:12px 16px;"><span class="tecla">Ctrl</span> + <span class="tecla">Z</span></td>
+          <td style="padding:12px 16px;">¡Deshace lo último que hiciste! Muy útil si te equivocas</td>
+        </tr>
+      </table>
+    </div>
+
+    <div class="tip-box">
+      <strong>💡 El mejor truco del teclado:</strong> <span class="tecla">Ctrl</span>+<span class="tecla">Z</span> = <strong>Deshacer</strong>. Si hiciste algo mal (borraste algo, moviste algo sin querer...), pulsa Ctrl+Z y vuelve al estado anterior. ¡Como una máquina del tiempo!
+    </div>
+
+    <div class="demo-interactiva" style="margin-top:16px;">
+      <h4>🖱️ Prueba: Copia un archivo</h4>
+      <div style="display:flex;gap:14px;flex-wrap:wrap;margin-top:10px;align-items:flex-start;">
+        <div style="flex:1;min-width:160px;">
+          <p style="font-size:13px;color:#888;text-align:center;margin-bottom:6px;">Origen: Documentos</p>
+          <div style="background:#f8f8f8;border:1px solid #ddd;border-radius:8px;padding:10px;min-height:90px;" id="origen-archivos">
+            <div class="win10-vista-iconos">
+              <div class="win10-icono" id="archivo-copiar" onclick="seleccionarIcono(this);mostrarMensaje('Archivo seleccionado. Ahora elige Copiar o Cortar.', 'info')">
+                <div class="ic-imagen">📄</div>
+                <div class="ic-nombre">mi_carta.docx</div>
+              </div>
+            </div>
+          </div>
+        </div>
+        <div style="display:flex;flex-direction:column;gap:8px;justify-content:center;">
+          <button class="btn-demo verde" onclick="copiarArchivo()">📋 Copiar (Ctrl+C)</button>
+          <button class="btn-demo" onclick="cortarArchivo()">✂️ Cortar (Ctrl+X)</button>
+        </div>
+        <div style="flex:1;min-width:160px;">
+          <p style="font-size:13px;color:#888;text-align:center;margin-bottom:6px;">Destino: Trabajo</p>
+          <div id="destino-archivos" style="background:#fffde7;border:2px dashed #f9a825;border-radius:8px;padding:10px;min-height:90px;">
+            <p style="font-size:13px;color:#aaa;text-align:center;margin-top:16px;">Vacío</p>
+          </div>
+          <button id="btn-pegar-archivo" class="btn-demo" style="margin-top:8px;width:100%;background:#555;" disabled onclick="pegarArchivo()">📂 Pegar (Ctrl+V)</button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- SLIDE 6 — Resumen final -->
+  <div class="slide" id="slide-5">
+    <div class="slide-titulo">Resumen del Módulo 3</div>
+    <div class="slide-subtitulo">¡Has completado los 3 módulos! Esto es lo que has aprendido</div>
+    <div class="explicacion">
+      <ul class="pasos-lista">
+        <li>Un <strong>archivo</strong> tiene contenido (texto, foto, música...). Una <strong>carpeta</strong> solo contiene archivos</li>
+        <li>El tipo de archivo se reconoce por la <strong>extensión</strong>: .docx, .pdf, .jpg, .mp3...</li>
+        <li>Para <strong>abrir</strong> un archivo: <strong>doble clic</strong></li>
+        <li>Para <strong>guardar</strong>: <span class="tecla">Ctrl</span>+<span class="tecla">S</span> (rápido) o "Guardar como" para elegir nombre y carpeta</li>
+        <li>Para <strong>copiar/mover</strong>: <span class="tecla">Ctrl</span>+<span class="tecla">C</span>/<span class="tecla">X</span> y luego <span class="tecla">Ctrl</span>+<span class="tecla">V</span></li>
+        <li>Para <strong>deshacer</strong> un error: <span class="tecla">Ctrl</span>+<span class="tecla">Z</span></li>
+      </ul>
+    </div>
+
+    <div style="background:#e8f5e9;border-radius:12px;padding:24px;text-align:center;margin:20px 0;">
+      <div style="font-size:52px;margin-bottom:10px;">🎉</div>
+      <h3 style="font-size:22px;color:#107c10;margin-bottom:8px;">¡Has completado los 3 módulos!</h3>
+      <p style="font-size:17px;color:#555;">Ahora prueba los juegos para repasar lo aprendido.</p>
+    </div>
+
+    <div style="display:flex;gap:16px;justify-content:center;margin-top:20px;flex-wrap:wrap;">
+      <a href="modulo2.html" class="btn btn-secundario">← Módulo 2</a>
+      <a href="index.html" class="btn btn-secundario">🏠 Menú</a>
+      <a href="juego1.html" class="btn btn-primario">🎮 Ir a los Juegos →</a>
+    </div>
+  </div>
+
+  <div class="navegacion">
+    <button class="btn btn-secundario" id="btn-anterior" disabled>◀ Anterior</button>
+    <span class="contador-slide" id="contador-slide">1 / 6</span>
+    <button class="btn btn-primario" id="btn-siguiente">Siguiente ▶</button>
+  </div>
+
+</div>
+
+<script src="js/interactivo.js"></script>
+<script>
+function simularAbrirArchivo(msg, nombre) {
+  mostrarMensaje(msg + ' (' + nombre + ')', 'ok');
+}
+
+function simularGuardar() {
+  const nombre = document.getElementById('nombre-guardar-sim').value || 'Documento';
+  mostrarMensaje('✔ Archivo guardado como "' + nombre + '.docx" en Documentos', 'ok');
+}
+
+let accionArch = null;
+function copiarArchivo() {
+  const arch = document.getElementById('archivo-copiar');
+  if (!arch.classList.contains('seleccionado')) { mostrarMensaje('Primero selecciona el archivo (clic sobre él)', 'error'); return; }
+  accionArch = 'copiar';
+  document.getElementById('btn-pegar-archivo').disabled = false;
+  mostrarMensaje('📋 Copiado. Ahora haz clic en Pegar en la carpeta destino.', 'info');
+}
+function cortarArchivo() {
+  const arch = document.getElementById('archivo-copiar');
+  if (!arch.classList.contains('seleccionado')) { mostrarMensaje('Primero selecciona el archivo (clic sobre él)', 'error'); return; }
+  accionArch = 'cortar';
+  arch.style.opacity = '0.4';
+  document.getElementById('btn-pegar-archivo').disabled = false;
+  mostrarMensaje('✂️ Cortado. Ahora haz clic en Pegar en la carpeta destino.', 'info');
+}
+function pegarArchivo() {
+  if (!accionArch) return;
+  const dest = document.getElementById('destino-archivos');
+  dest.innerHTML = '';
+  dest.style.borderStyle = 'solid'; dest.style.borderColor = '#107c10';
+  const ic = document.createElement('div');
+  ic.className = 'win10-icono';
+  ic.innerHTML = '<div class="ic-imagen" style="font-size:32px;">📄</div><div class="ic-nombre">mi_carta.docx</div>';
+  dest.appendChild(ic);
+  if (accionArch === 'cortar') {
+    mostrarMensaje('✔ Archivo MOVIDO a la carpeta Trabajo.', 'ok');
+  } else {
+    document.getElementById('archivo-copiar').style.opacity = '1';
+    mostrarMensaje('✔ Archivo COPIADO. El original sigue en Documentos.', 'ok');
+  }
+  document.getElementById('btn-pegar-archivo').disabled = true;
+  accionArch = null;
+}
+</script>
+</body>
+</html>

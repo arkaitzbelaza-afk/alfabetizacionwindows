@@ -1,0 +1,494 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Práctica de Teclado — Taller Windows 10</title>
+<link rel="stylesheet" href="css/estilos.css">
+<style>
+.juego-pantalla { max-width: 860px; margin: 0 auto; padding: 20px; }
+
+.intro-juego { background: white; border-radius: 14px; padding: 36px; text-align: center; box-shadow: 0 4px 16px rgba(0,0,0,0.1); }
+.intro-juego h2 { font-size: 30px; color: #0078d4; margin-bottom: 12px; }
+
+.utilidad-box { background: #e8f4fd; border-left: 4px solid #0078d4; border-radius: 0 10px 10px 0; padding: 18px 22px; margin: 20px 0; text-align: left; }
+.utilidad-box h3 { font-size: 18px; color: #005a9e; margin-bottom: 10px; }
+.utilidad-box ul { list-style: none; padding: 0; }
+.utilidad-box ul li { padding: 5px 0; font-size: 17px; }
+.utilidad-box ul li::before { content: "✓ "; color: #0078d4; font-weight: bold; }
+
+/* Panel de stats */
+.panel-juego { display: flex; justify-content: space-between; align-items: center; background: #1a1a2e; color: white; padding: 12px 20px; border-radius: 10px; margin-bottom: 20px; flex-wrap: wrap; gap: 10px; }
+.panel-dato { text-align: center; }
+.panel-dato .valor { font-size: 26px; font-weight: 700; color: #4da3ff; }
+.panel-dato .etiqueta { font-size: 12px; color: #aaa; }
+
+/* Timer barra */
+.timer-barra-cont { height: 8px; background: #333; border-radius: 4px; margin-bottom: 16px; overflow: hidden; }
+.timer-barra-fill { height: 100%; background: #0078d4; transition: width 1s linear, background 0.5s; border-radius: 4px; }
+
+/* Área de texto a escribir */
+.texto-modelo-cont {
+  background: white;
+  border-radius: 10px;
+  padding: 22px 26px;
+  margin-bottom: 14px;
+  box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+}
+.contexto-texto {
+  font-size: 13px;
+  color: #0078d4;
+  font-weight: 600;
+  margin-bottom: 8px;
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}
+.texto-modelo {
+  font-size: 22px;
+  line-height: 1.7;
+  letter-spacing: 0.3px;
+  font-family: 'Segoe UI', Arial, sans-serif;
+  color: #ccc;
+  word-break: break-word;
+}
+.letra-ok { color: #107c10; }
+.letra-error { color: #d83b01; background: #fde7e0; border-radius: 2px; }
+.letra-pendiente { color: #ccc; }
+.letra-cursor { border-left: 2px solid #0078d4; animation: parpadeo 0.8s infinite; }
+@keyframes parpadeo { 0%,100% { border-color: #0078d4; } 50% { border-color: transparent; } }
+
+/* Input oculto */
+.input-oculto {
+  position: absolute;
+  opacity: 0;
+  width: 1px;
+  height: 1px;
+  pointer-events: none;
+}
+
+/* Área de escritura visible */
+.zona-escritura {
+  background: #f8f9ff;
+  border: 2px solid #b3d0f5;
+  border-radius: 8px;
+  padding: 14px 18px;
+  font-size: 18px;
+  color: #333;
+  cursor: text;
+  min-height: 52px;
+  display: flex;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 0;
+  line-height: 1.6;
+  margin-bottom: 12px;
+  word-break: break-word;
+}
+.zona-escritura:focus-within { border-color: #0078d4; box-shadow: 0 0 0 3px rgba(0,120,212,0.15); }
+.zona-hint { font-size: 15px; color: #aaa; font-style: italic; }
+
+/* Stats en tiempo real */
+.stats-live { display: flex; gap: 20px; margin-bottom: 16px; flex-wrap: wrap; }
+.stat-chip { background: #f0f0f0; border-radius: 20px; padding: 6px 16px; font-size: 15px; color: #555; display: flex; align-items: center; gap: 6px; }
+.stat-chip .num { font-weight: 700; color: #0078d4; }
+.stat-chip .num.error { color: #d83b01; }
+
+/* Progreso de texto */
+.progreso-texto-cont { display: flex; gap: 8px; margin-bottom: 12px; }
+.progreso-punto { width: 12px; height: 12px; border-radius: 50%; background: #ddd; transition: background 0.3s; }
+.progreso-punto.hecho { background: #107c10; }
+.progreso-punto.actual { background: #0078d4; }
+
+/* Resultado intermedio */
+.resultado-texto {
+  background: white;
+  border-radius: 10px;
+  padding: 20px 24px;
+  margin-bottom: 16px;
+  box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+  display: none;
+}
+.resultado-texto.visible { display: block; }
+.resultado-texto h3 { font-size: 18px; color: #107c10; margin-bottom: 12px; }
+.stats-resultado { display: flex; gap: 20px; flex-wrap: wrap; margin-bottom: 14px; }
+.stat-res { text-align: center; }
+.stat-res .sr-valor { font-size: 28px; font-weight: 700; color: #0078d4; }
+.stat-res .sr-label { font-size: 13px; color: #888; }
+
+/* Pantalla final */
+.resultado-final { background: white; border-radius: 14px; padding: 36px; text-align: center; box-shadow: 0 4px 16px rgba(0,0,0,0.1); display: none; }
+.resultado-final.visible { display: block; }
+.puntos-grandes { font-size: 80px; font-weight: 700; color: #0078d4; line-height: 1; }
+.estrellas-res { font-size: 44px; margin: 12px 0; }
+.detalles-finales { display: flex; justify-content: center; gap: 28px; margin: 20px 0; flex-wrap: wrap; }
+.detalle-item .di-valor { font-size: 30px; font-weight: 700; color: #333; }
+.detalle-item .di-label { font-size: 13px; color: #888; }
+</style>
+</head>
+<body>
+
+<div class="taller-header">
+  <h1>⌨️ Práctica de Teclado</h1>
+  <span class="modulo-badge">Taller de Alfabetización Digital</span>
+</div>
+
+<div class="juego-pantalla">
+
+  <!-- INTRO -->
+  <div id="pantalla-intro">
+    <div class="intro-juego">
+      <div style="font-size:72px;margin-bottom:12px;">⌨️</div>
+      <h2>Práctica de Teclado</h2>
+      <p style="font-size:18px;color:#555;margin-bottom:24px;">Practica escribiendo textos reales que usarás en trámites con la administración pública</p>
+
+      <div class="utilidad-box">
+        <h3>¿Para qué te va a servir esta práctica?</h3>
+        <ul>
+          <li>Escribir tu nombre, dirección y datos en formularios oficiales</li>
+          <li>Redactar el asunto y cuerpo de correos a organismos públicos</li>
+          <li>Escribir correctamente tu email, DNI y número de teléfono</li>
+          <li>Ganar velocidad y confianza al teclear sin miedo a equivocarte</li>
+          <li>Identificar las letras especiales más usadas en español (ñ, tildes...)</li>
+        </ul>
+      </div>
+
+      <div style="background:#e8f5e9;border-radius:10px;padding:16px;margin:16px 0;font-size:16px;color:#333;text-align:left;">
+        <strong>🎮 Cómo funciona:</strong> Aparece un texto relacionado con trámites reales.
+        Escríbelo tal cual en el cuadro de texto. Cada letra correcta suma puntos.
+        Tienes 60 segundos por texto · 5 textos por partida.
+      </div>
+
+      <div id="record-display" style="background:#fff3cd;border-radius:10px;padding:14px;margin:12px 0;font-size:17px;display:none;">
+        🏆 Tu récord personal: <strong id="record-valor">0</strong> puntos
+      </div>
+
+      <button class="btn btn-primario" onclick="iniciarJuego()" style="font-size:22px;padding:16px 40px;margin-top:10px;">
+        ¡Empezar a practicar!
+      </button>
+      <p style="font-size:15px;color:#888;margin-top:16px;">5 textos · ~15 minutos · Tu récord se guarda automáticamente</p>
+    </div>
+  </div>
+
+  <!-- JUEGO -->
+  <div id="pantalla-juego" style="display:none;">
+    <div class="panel-juego">
+      <div class="panel-dato">
+        <div class="valor" id="puntos-display">0</div>
+        <div class="etiqueta">PUNTOS</div>
+      </div>
+      <div class="panel-dato">
+        <div class="valor" id="wpm-display">0</div>
+        <div class="etiqueta">PALABRAS/MIN</div>
+      </div>
+      <div class="panel-dato">
+        <div class="valor" id="errores-display">0</div>
+        <div class="etiqueta">ERRORES</div>
+      </div>
+      <div class="panel-dato">
+        <div class="valor" id="texto-display">1/5</div>
+        <div class="etiqueta">TEXTO</div>
+      </div>
+      <div class="panel-dato">
+        <div class="valor" id="record-panel">—</div>
+        <div class="etiqueta">RÉCORD</div>
+      </div>
+    </div>
+
+    <div class="timer-barra-cont">
+      <div class="timer-barra-fill" id="timer-fill" style="width:100%;"></div>
+    </div>
+
+    <div class="progreso-texto-cont" id="progreso-puntos"></div>
+
+    <div class="texto-modelo-cont">
+      <div class="contexto-texto" id="contexto-texto">📋 Contexto del texto</div>
+      <div class="texto-modelo" id="texto-modelo"></div>
+    </div>
+
+    <div class="stats-live">
+      <div class="stat-chip">⏱ Tiempo: <span class="num" id="seg-live">60</span>s</div>
+      <div class="stat-chip">✅ Correctas: <span class="num" id="correctas-live">0</span></div>
+      <div class="stat-chip">❌ Errores: <span class="num error" id="errores-live">0</span></div>
+      <div class="stat-chip">📊 Precisión: <span class="num" id="prec-live">—</span></div>
+    </div>
+
+    <div class="zona-escritura" id="zona-escritura" onclick="document.getElementById('input-oculto').focus()">
+      <span class="zona-hint" id="zona-hint">Haz clic aquí y empieza a escribir...</span>
+    </div>
+    <input type="text" class="input-oculto" id="input-oculto" autocomplete="off" autocorrect="off" autocapitalize="off" spellcheck="false">
+
+    <div style="display:flex;gap:12px;flex-wrap:wrap;margin-top:8px;">
+      <button class="btn btn-secundario" onclick="saltarTexto()" style="font-size:15px;padding:10px 22px;">⏭ Saltar texto</button>
+    </div>
+  </div>
+
+  <!-- RESULTADO FINAL -->
+  <div id="pantalla-resultado" class="resultado-final">
+    <div class="estrellas-res" id="estrellas-res"></div>
+    <div class="puntos-grandes" id="puntos-res">0</div>
+    <div style="font-size:22px;color:#888;margin-bottom:8px;">puntos</div>
+    <div style="font-size:18px;font-weight:600;margin:8px 0;" id="record-res"></div>
+    <div class="detalles-finales">
+      <div class="detalle-item"><div class="di-valor" id="wpm-res">0</div><div class="di-label">Palabras/min (media)</div></div>
+      <div class="detalle-item"><div class="di-valor" id="prec-res">0%</div><div class="di-label">Precisión total</div></div>
+      <div class="detalle-item"><div class="di-valor" id="err-res">0</div><div class="di-label">Errores totales</div></div>
+    </div>
+    <div style="font-size:21px;margin:16px 0;color:#333;" id="mensaje-res"></div>
+    <div style="margin-top:24px;display:flex;gap:14px;justify-content:center;flex-wrap:wrap;">
+      <button class="btn btn-primario" onclick="reiniciarJuego()">🔄 Jugar otra vez</button>
+      <a href="index.html" class="btn btn-secundario">← Volver al menú</a>
+    </div>
+  </div>
+
+</div>
+
+<script>
+const TEXTOS = [
+  { ctx: '📋 Datos personales en un formulario', txt: 'María García López, DNI 12345678A, nacida el 15 de marzo de 1978 en Bilbao.' },
+  { ctx: '🏠 Dirección postal para una solicitud', txt: 'Calle Mayor, 15, 3º izquierda, 48001 Bilbao, Bizkaia.' },
+  { ctx: '📧 Correo electrónico a la administración', txt: 'me dirijo a ustedes para solicitar información sobre mi expediente número 2024-BIL-004821.' },
+  { ctx: '📞 Datos de contacto en un impreso', txt: 'Teléfono de contacto: 946 12 34 56. Correo electrónico: maria.garcia@gmail.com' },
+  { ctx: '🏛️ Asunto de un correo al Ayuntamiento', txt: 'Solicitud de certificado de empadronamiento para trámite con la Seguridad Social.' },
+  { ctx: '📄 Descripción de un documento adjunto', txt: 'Adjunto DNI por ambas caras en formato PDF y certificado de empadronamiento actualizado.' },
+  { ctx: '💼 Inscripción a una oferta de empleo', txt: 'Estoy interesada en el puesto de auxiliar administrativo publicado en Lanbide el día 3 de junio.' },
+  { ctx: '🔑 Nombre de usuario para una sede electrónica', txt: 'Para acceder, introduzca su DNI o NIE sin espacios y sin guión: 12345678A' },
+  { ctx: '📋 Motivo de una solicitud oficial', txt: 'El motivo de esta solicitud es obtener la prestación por desempleo tras la finalización de mi contrato.' },
+  { ctx: '🏠 Datos del domicilio en un formulario', txt: 'Municipio: Getxo. Código postal: 48992. País: España. Provincia: Bizkaia.' },
+  { ctx: '📧 Despedida formal de un correo', txt: 'Quedando a su disposición para cualquier consulta, reciban un cordial saludo.' },
+  { ctx: '📅 Fecha y lugar en un documento oficial', txt: 'En Bilbao, a 3 de junio de 2024.' },
+  { ctx: '💼 Experiencia laboral en una solicitud', txt: 'He trabajado durante cinco años como auxiliar de oficina en empresas del sector servicios.' },
+  { ctx: '🏛️ Encabezado de una instancia oficial', txt: 'Al Excmo. Ayuntamiento de Bilbao, Departamento de Ciudadanía y Servicios Sociales.' },
+  { ctx: '📄 Número de referencia de un expediente', txt: 'Número de referencia: EXP-2024-BIZKAIA-00481. Fecha de apertura: 01/06/2024.' },
+  { ctx: '📋 Datos del solicitante', txt: 'Nombre: Ana Martínez Ruiz. NIE: X1234567B. Nacionalidad: italiana. Residencia: Barakaldo.' },
+  { ctx: '🔑 Contraseña segura para una cuenta', txt: 'Su contraseña debe tener al menos 8 caracteres, una mayúscula y un número.' },
+  { ctx: '📧 Asunto de correo para solicitar cita', txt: 'Solicitud de cita previa para renovación del permiso de residencia, mes de junio de 2024.' },
+  { ctx: '🏠 Cambio de domicilio en padrón municipal', txt: 'Solicito el cambio de domicilio en el Padrón Municipal a Calle Autonomía, 52, 2º derecha, Bilbao.' },
+  { ctx: '💼 Formación académica en un formulario', txt: 'Titulación: Técnico en Administración y Finanzas. Centro: IES Arangoiti, Bilbao. Año: 2019.' },
+  { ctx: '📋 Descripción breve para una solicitud', txt: 'Solicito plaza en el curso de Informática Básica para mayores de 45 años, modalidad presencial.' },
+  { ctx: '🏛️ Nota al pie de un documento oficial', txt: 'Este documento tiene validez oficial y puede ser presentado ante cualquier organismo público.' },
+  { ctx: '📄 Instrucciones de un formulario online', txt: 'Rellene todos los campos obligatorios marcados con asterisco y adjunte la documentación requerida.' },
+  { ctx: '📧 Cuerpo principal de un correo formal', txt: 'Por medio de la presente me pongo en contacto con ustedes para comunicar el cambio de mis datos personales.' },
+  { ctx: '💼 Intereses profesionales en un currículum', txt: 'Busco incorporarme a una empresa donde pueda desarrollar mis habilidades administrativas y de atención al público.' },
+];
+
+// Estado
+let textos = [], txtIdx = 0;
+let puntosTotales = 0, wpms = [], errTotales = 0, correctasTotales = 0;
+let timer = null, seg = 60;
+let escrito = '', errores = 0, correctas = 0;
+let inicioTexto = null, activo = false;
+
+const TOTAL_TEXTOS = 5;
+
+function iniciarJuego() {
+  // Seleccionar 5 textos aleatorios sin repetir
+  const mezcla = [...TEXTOS].sort(() => Math.random() - 0.5);
+  textos = mezcla.slice(0, TOTAL_TEXTOS);
+  txtIdx = 0; puntosTotales = 0; wpms = []; errTotales = 0; correctasTotales = 0;
+
+  document.getElementById('pantalla-intro').style.display = 'none';
+  document.getElementById('pantalla-resultado').classList.remove('visible');
+  document.getElementById('pantalla-juego').style.display = 'block';
+  const r = localStorage.getItem('teclado_record');
+  document.getElementById('record-panel').textContent = r ? r + ' pts' : '—';
+
+  construirProgreso();
+  cargarTexto();
+}
+
+function construirProgreso() {
+  const cont = document.getElementById('progreso-puntos');
+  cont.innerHTML = '';
+  for (let i = 0; i < TOTAL_TEXTOS; i++) {
+    const d = document.createElement('div');
+    d.className = 'progreso-punto' + (i === 0 ? ' actual' : '');
+    d.id = 'pp-' + i;
+    cont.appendChild(d);
+  }
+}
+
+function actualizarProgreso() {
+  for (let i = 0; i < TOTAL_TEXTOS; i++) {
+    const d = document.getElementById('pp-' + i);
+    if (!d) continue;
+    if (i < txtIdx) d.className = 'progreso-punto hecho';
+    else if (i === txtIdx) d.className = 'progreso-punto actual';
+    else d.className = 'progreso-punto';
+  }
+}
+
+function cargarTexto() {
+  const t = textos[txtIdx];
+  escrito = ''; errores = 0; correctas = 0; inicioTexto = null; activo = true;
+  seg = 60;
+
+  document.getElementById('texto-display').textContent = `${txtIdx + 1}/${TOTAL_TEXTOS}`;
+  document.getElementById('contexto-texto').textContent = t.ctx;
+  document.getElementById('errores-display').textContent = errTotales;
+  document.getElementById('seg-live').textContent = 60;
+  document.getElementById('correctas-live').textContent = 0;
+  document.getElementById('errores-live').textContent = 0;
+  document.getElementById('prec-live').textContent = '—';
+  document.getElementById('wpm-display').textContent = 0;
+  document.getElementById('zona-hint').style.display = '';
+  actualizarProgreso();
+  renderizarTexto();
+
+  document.getElementById('timer-fill').style.width = '100%';
+  document.getElementById('timer-fill').style.background = '#0078d4';
+
+  const inp = document.getElementById('input-oculto');
+  inp.value = '';
+  inp.oninput = manejarInput;
+  inp.focus();
+
+  clearInterval(timer);
+  timer = setInterval(tickTimer, 1000);
+}
+
+function tickTimer() {
+  seg--;
+  document.getElementById('seg-live').textContent = seg;
+  const pct = (seg / 60) * 100;
+  const col = seg > 20 ? '#0078d4' : seg > 10 ? '#f9a825' : '#d83b01';
+  const fill = document.getElementById('timer-fill');
+  fill.style.width = pct + '%';
+  fill.style.background = col;
+  if (seg <= 0) {
+    clearInterval(timer);
+    finalizarTexto(true);
+  }
+}
+
+function manejarInput(e) {
+  if (!activo) return;
+  const inp = document.getElementById('input-oculto');
+  const t = textos[txtIdx];
+
+  if (!inicioTexto && inp.value.length > 0) inicioTexto = Date.now();
+
+  escrito = inp.value;
+  errores = 0; correctas = 0;
+
+  for (let i = 0; i < escrito.length; i++) {
+    if (i < t.txt.length) {
+      if (escrito[i] === t.txt[i]) correctas++;
+      else errores++;
+    }
+  }
+
+  document.getElementById('correctas-live').textContent = correctas;
+  document.getElementById('errores-live').textContent = errores;
+  const total = correctas + errores;
+  document.getElementById('prec-live').textContent = total > 0 ? Math.round((correctas / total) * 100) + '%' : '—';
+
+  const elapsed = inicioTexto ? (Date.now() - inicioTexto) / 60000 : 0;
+  const wpm = elapsed > 0 ? Math.round((correctas / 5) / elapsed) : 0;
+  document.getElementById('wpm-display').textContent = wpm;
+
+  if (escrito.length > 0) document.getElementById('zona-hint').style.display = 'none';
+  else document.getElementById('zona-hint').style.display = '';
+
+  renderizarTexto();
+
+  // Texto completo
+  if (escrito.length >= t.txt.length) {
+    clearInterval(timer);
+    setTimeout(() => finalizarTexto(false), 300);
+  }
+}
+
+function renderizarTexto() {
+  const t = textos[txtIdx];
+  const modelo = document.getElementById('texto-modelo');
+  let html = '';
+  for (let i = 0; i < t.txt.length; i++) {
+    const ch = t.txt[i] === ' ' ? '&nbsp;' : t.txt[i];
+    if (i < escrito.length) {
+      if (escrito[i] === t.txt[i]) html += `<span class="letra-ok">${ch}</span>`;
+      else html += `<span class="letra-error">${ch}</span>`;
+    } else if (i === escrito.length) {
+      html += `<span class="letra-pendiente letra-cursor">${ch}</span>`;
+    } else {
+      html += `<span class="letra-pendiente">${ch}</span>`;
+    }
+  }
+  modelo.innerHTML = html;
+}
+
+function finalizarTexto(timeout) {
+  activo = false;
+  clearInterval(timer);
+
+  const t = textos[txtIdx];
+  const elapsed = inicioTexto ? (Date.now() - inicioTexto) / 60000 : 1;
+  const wpm = elapsed > 0 ? Math.round((correctas / 5) / elapsed) : 0;
+  const prec = (correctas + errores) > 0 ? Math.round((correctas / (correctas + errores)) * 100) : 0;
+  const pts = Math.max(0, correctas * 2 - errores * 3 + (timeout ? 0 : 20));
+
+  puntosTotales += pts;
+  wpms.push(wpm);
+  errTotales += errores;
+  correctasTotales += correctas;
+
+  document.getElementById('puntos-display').textContent = puntosTotales;
+
+  txtIdx++;
+  if (txtIdx >= TOTAL_TEXTOS) {
+    setTimeout(mostrarResultado, 500);
+  } else {
+    setTimeout(cargarTexto, 900);
+  }
+}
+
+function saltarTexto() {
+  if (!activo) return;
+  clearInterval(timer);
+  errTotales += 5;
+  txtIdx++;
+  if (txtIdx >= TOTAL_TEXTOS) mostrarResultado();
+  else cargarTexto();
+}
+
+function mostrarResultado() {
+  clearInterval(timer);
+  const wpmMedia = wpms.length > 0 ? Math.round(wpms.reduce((a,b) => a+b, 0) / wpms.length) : 0;
+  const precTotal = (correctasTotales + errTotales) > 0 ? Math.round((correctasTotales / (correctasTotales + errTotales)) * 100) : 0;
+  const prev = parseInt(localStorage.getItem('teclado_record') || '0');
+  const esRecord = puntosTotales > prev;
+  if (esRecord) localStorage.setItem('teclado_record', puntosTotales);
+
+  document.getElementById('pantalla-juego').style.display = 'none';
+  const p = document.getElementById('pantalla-resultado');
+  p.classList.add('visible');
+  document.getElementById('puntos-res').textContent = puntosTotales;
+  document.getElementById('wpm-res').textContent = wpmMedia;
+  document.getElementById('prec-res').textContent = precTotal + '%';
+  document.getElementById('err-res').textContent = errTotales;
+
+  const rEl = document.getElementById('record-res');
+  rEl.style.color = esRecord ? '#d4a017' : '#107c10';
+  rEl.textContent = esRecord ? '🏆 ¡Nuevo récord personal!' : `Tu récord: ${prev} puntos`;
+
+  let est, msg;
+  if (precTotal >= 95) { est = '⭐⭐⭐'; msg = '¡Precisión excelente! Escribes con mucha seguridad.'; }
+  else if (precTotal >= 80) { est = '⭐⭐'; msg = '¡Muy bien! Cada vez cometes menos errores.'; }
+  else { est = '⭐'; msg = 'Sigue practicando, la velocidad y precisión mejoran con el tiempo.'; }
+  document.getElementById('estrellas-res').textContent = est;
+  document.getElementById('mensaje-res').textContent = msg;
+  p.scrollIntoView({ behavior: 'smooth', block: 'start' });
+}
+
+function reiniciarJuego() { iniciarJuego(); }
+
+window.addEventListener('DOMContentLoaded', () => {
+  const r = localStorage.getItem('teclado_record');
+  if (r) {
+    document.getElementById('record-display').style.display = 'block';
+    document.getElementById('record-valor').textContent = r;
+  }
+});
+</script>
+</body>
+</html>
